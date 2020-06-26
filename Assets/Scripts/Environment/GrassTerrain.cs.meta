@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: a7d2af523d987344d9c6c1ca9c09cfd1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - grassPrefab: {fileID: 8850991965134522601, guid: a9fa003f300e56842abee1c3fa164414,
+      type: 3}
+  executionOrder: 50
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

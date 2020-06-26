@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 70464557ff2001446a7d9d9190a7d05f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bunnyPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
+      type: 3}
+  executionOrder: 100
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
