@@ -4,17 +4,20 @@ using System.ComponentModel;
 using System.Security.Cryptography;
 using UnityEngine;
 
-public class Cubes : MonoBehaviour
-{
-    public static Cubes Instance;
-    public Transform grassPrefab;
+namespace Cubes {
 
-    void Awake()
+    public class Cubes : MonoBehaviour
     {
-        Instance = this;
+        public static Cubes Instance;
+        public Transform grassPrefab;
+
+        void Awake()
+        {
+            Instance = this;
+        }
     }
 
-    public class TerrainCube
+    public class TerrainCube : MonoBehaviour
     {
         public bool isWalkable;
         public bool isEmpty = true;
@@ -36,12 +39,15 @@ public class Cubes : MonoBehaviour
         {
             return worldObject.transform.position;
         }
+
+        public void setMaterial(Material newMaterial)
+        {
+            worldObject.GetComponent<MeshRenderer>().material = newMaterial;
+        }
     }
 
     public class GrassCube : TerrainCube
     {
-        //public Transform grassPrefab;
-        //public bool isWalkable = true;
         public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, Cubes.Instance.grassPrefab, parent, name)
         {
         }

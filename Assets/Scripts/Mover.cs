@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Terrain;
+using Cubes;
 
 public class Mover : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class Mover : MonoBehaviour
 
     public bool move(Vector3 newGridPos)
     {
-        Cubes.TerrainCube[,] terrainCubes = environment.getTerrainData().terrainCubes;
+        TerrainCube[,] terrainCubes = environment.getTerrainData().terrainCubes;
         transform.position = terrainCubes[(int)newGridPos.x, (int)newGridPos.z].getPos() + new Vector3(0f, 0.5f, 0f);
 
         return true;
