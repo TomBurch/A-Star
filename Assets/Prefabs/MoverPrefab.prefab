@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3220614401623209153}
   - component: {fileID: 3220614401623209154}
   - component: {fileID: 3220614401623209155}
-  - component: {fileID: 3220614401623209167}
+  - component: {fileID: 938831231662463481}
   m_Layer: 0
-  m_Name: BunnyPrefab
+  m_Name: MoverPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3220614401623209156}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -93,7 +93,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3220614401623209167
+--- !u!114 &938831231662463481
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,10 +102,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3220614401623209156}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55e74eb03e0fbfe44a9bde3285d6c6b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 57b20fab030b940469f605fc17ec607a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xPos: 0
-  yPos: 0
-  maxHunger: 10
-  maxThirst: 10
+  moverPrefab: {fileID: 0}
