@@ -22,7 +22,7 @@ public class Mover : MonoBehaviour
         if (currentTime - lastMovementTime >= 1)
         {
             Vector3 randomPos = new Vector3(Random.Range(0f, 10f), 0.5f, Random.Range(0f, 10f));
-            move(randomPos);
+        //    move(randomPos);
             lastMovementTime = Time.time;
         }
     }

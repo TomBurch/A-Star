@@ -17,7 +17,7 @@ namespace Terrain {
             {
                 for (int x = 0; x < size; x++)
                 {
-                    terrainData.terrainCubes[z, x] = new GrassCube(z, x, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
+                    terrainData.terrainCubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
                 }
             }
 

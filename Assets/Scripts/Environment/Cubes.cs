@@ -20,9 +20,8 @@ namespace Cubes {
     public class TerrainCube : MonoBehaviour
     {
         public bool isWalkable;
-        public bool isEmpty = true;
         public GameObject worldObject;
-        int xPos, zPos;
+        public int xPos, zPos;
 
         public TerrainCube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name)
         {
@@ -40,8 +39,12 @@ namespace Cubes {
             return worldObject.transform.position;
         }
 
-        public void setMaterial(Material newMaterial)
-        {
+        public void setMaterial(Material newMaterial) {
+            worldObject.GetComponent<MeshRenderer>().material = newMaterial;
+        }
+
+        public IEnumerator setMaterialAfterDelay(Material newMaterial, float delay) {
+            yield return new WaitForSeconds(delay);
             worldObject.GetComponent<MeshRenderer>().material = newMaterial;
         }
     }
