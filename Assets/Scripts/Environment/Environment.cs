@@ -15,6 +15,7 @@ public class Environment : MonoBehaviour
     public Material endMaterial;
     public Material visitedMaterial;
     public Material neighbourMaterial;
+    public Material pathMaterial;
 
     public float animationDelay;
 
@@ -78,6 +79,7 @@ public class Environment : MonoBehaviour
 
                 if (newWeight < neighbour.weight) {
                     neighbour.weight = newWeight;
+                    neighbour.previousNode = currentNode;
                 }
             }
 
@@ -93,11 +95,20 @@ public class Environment : MonoBehaviour
             if (currentNode.terrainCube.worldObject == target.worldObject) {
                 print("Target reached");
                 break;
-                //return;
             }
 
             currentNode = getClosestNode(unvisited);
             whileIncrement++;
+        }
+
+        Node tailNode = currentNode;
+        int pathIncrement = 1;
+        while (tailNode.previousNode != null) {
+            if (tailNode.previousNode.terrainCube.worldObject != start.worldObject) {
+                StartCoroutine(tailNode.previousNode.terrainCube.setMaterialAfterDelay(pathMaterial, (animationDelay * whileIncrement) + (animationDelay * pathIncrement)));
+            }
+            tailNode = tailNode.previousNode;
+            pathIncrement++;
         }
     }
 
@@ -167,12 +178,14 @@ public class Environment : MonoBehaviour
     private class Node {
         public float weight;
         public bool visited;
+        public Node previousNode;
         public Cubes.TerrainCube terrainCube;
 
         public Node(Cubes.TerrainCube terrainCube, float weight) {
             this.weight = weight;
             this.terrainCube = terrainCube;
             this.visited = false;
+            this.previousNode = null;
         }
     }
 }
