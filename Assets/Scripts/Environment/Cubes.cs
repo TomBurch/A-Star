@@ -34,8 +34,7 @@ namespace Cubes {
             this.worldObject = newCube.gameObject;
         }
 
-        public Vector3 getPos()
-        {
+        public Vector3 getPos() {
             return worldObject.transform.position;
         }
 

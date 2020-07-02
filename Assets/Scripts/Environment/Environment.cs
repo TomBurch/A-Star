@@ -29,19 +29,21 @@ public class Environment : MonoBehaviour
         start.setMaterial(startMaterial);
         end.setMaterial(endMaterial);
 
-        Instantiate(moverPrefab, start.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
+        GameObject moverObject = Instantiate(moverPrefab, start.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        Mover moverScript = moverObject.GetComponent<Mover>();
 
-        createPath(start, end);
+        moverScript.currentPath = createPath(start, end);
     }
 
     public Terrain.TerrainData getTerrainData() {
         return terrainData;
     }
 
-    public void createPath(Cubes.TerrainCube start, Cubes.TerrainCube target) {
+    public List<Cubes.TerrainCube> createPath(Cubes.TerrainCube start, Cubes.TerrainCube target) {
         List<List<Node>> grid = new List<List<Node>>();
         List<Node> unvisited = new List<Node>();
         List<Node> visited = new List<Node>();
+        List<Cubes.TerrainCube> path = new List<Cubes.TerrainCube>();
         Node currentNode = null;
 
         // Wrap each TerrainCube into a Node (giving it a weight variable)
@@ -103,13 +105,19 @@ public class Environment : MonoBehaviour
 
         Node tailNode = currentNode;
         int pathIncrement = 1;
+        path.Add(currentNode.terrainCube);
+
         while (tailNode.previousNode != null) {
             if (tailNode.previousNode.terrainCube.worldObject != start.worldObject) {
                 StartCoroutine(tailNode.previousNode.terrainCube.setMaterialAfterDelay(pathMaterial, (animationDelay * whileIncrement) + (animationDelay * pathIncrement)));
+                path.Add(tailNode.previousNode.terrainCube);
             }
             tailNode = tailNode.previousNode;
             pathIncrement++;
         }
+
+        path.Reverse();
+        return path;
     }
 
     private float getWeight(Cubes.TerrainCube start, Cubes.TerrainCube target, Node node) {
