@@ -4,7 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - grassPrefab: {fileID: 8850991965134522601, guid: a9fa003f300e56842abee1c3fa164414,
+  - treePrefab: {fileID: 5377376025468098663, guid: 06f6e3ceb0ca2c84eb904898eb8d8880,
       type: 3}
   executionOrder: 50
   icon: {instanceID: 0}

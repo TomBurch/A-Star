@@ -88,7 +88,6 @@ public class Environment : MonoBehaviour
             unvisited.Remove(currentNode);
             visited.Add(currentNode);
             currentNode.visited = true;
-            print("X: " + currentNode.terrainCube.xPos + ", Z: " + currentNode.terrainCube.zPos);
 
             if ((currentNode.terrainCube.worldObject != start.worldObject) && currentNode.terrainCube.worldObject != target.worldObject) {
                 StartCoroutine(currentNode.terrainCube.setMaterialAfterDelay(visitedMaterial, animationDelay * whileIncrement));

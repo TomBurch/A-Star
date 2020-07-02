@@ -20,11 +20,13 @@ namespace Cubes {
     public class TerrainCube : MonoBehaviour
     {
         public bool isWalkable;
+        public GameObject containedObject;
         public GameObject worldObject;
         public int xPos, zPos;
 
         public TerrainCube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name)
         {
+            this.containedObject = null;
             this.isWalkable = isWalkable;
             this.xPos = xPos;
             this.zPos = zPos;
