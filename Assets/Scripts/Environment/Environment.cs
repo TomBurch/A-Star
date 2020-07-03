@@ -85,8 +85,8 @@ public class Environment : MonoBehaviour
                 if ((neighbour.terrainCube.worldObject != start.worldObject) && neighbour.terrainCube.worldObject != target.worldObject) {
                     StartCoroutine(neighbour.terrainCube.setMaterialAfterDelay(neighbourMaterial, animationDelay * whileIncrement));
                 }
-                float newWeight = getWeight(start, target, neighbour);
 
+                float newWeight = getWeight(start, target, neighbour);
                 if (newWeight < neighbour.weight) {
                     neighbour.weight = newWeight;
                     neighbour.previousNode = currentNode;
@@ -144,7 +144,7 @@ public class Environment : MonoBehaviour
         if ((centerX - 1) >= 0) {
             Node neighbourNode = grid[centerZ][centerX - 1];
 
-            if (!neighbourNode.visited) {
+            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -152,7 +152,7 @@ public class Environment : MonoBehaviour
         if ((centerZ - 1) >= 0) {
             Node neighbourNode = grid[centerZ - 1][centerX];
 
-            if (!neighbourNode.visited) {
+            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -160,7 +160,7 @@ public class Environment : MonoBehaviour
         if ((centerX + 1) <= terrainData.size - 1) {
             Node neighbourNode = grid[centerZ][centerX + 1];
 
-            if (!neighbourNode.visited) {
+            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -168,7 +168,7 @@ public class Environment : MonoBehaviour
         if ((centerZ + 1) <= terrainData.size - 1) {
             Node neighbourNode = grid[centerZ + 1][centerX];
 
-            if (!neighbourNode.visited) {
+            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
