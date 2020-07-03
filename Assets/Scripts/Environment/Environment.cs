@@ -26,6 +26,14 @@ public class Environment : MonoBehaviour
         TerrainCube start = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
         TerrainCube end = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
 
+        while (start.isWalkable == false) {
+            start = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
+        }
+
+        while (end.isWalkable == false) {
+            end = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
+        }
+
         start.setMaterial(startMaterial);
         end.setMaterial(endMaterial);
 
