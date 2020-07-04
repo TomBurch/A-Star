@@ -11,6 +11,7 @@ namespace Terrain {
     public class GrassTerrain : MonoBehaviour {
 
         public Transform treePrefab;
+        public float treeSpawnChance;
 
         public TerrainData Generate(int size) {
             TerrainData terrainData = new TerrainData(size);
@@ -21,7 +22,7 @@ namespace Terrain {
                     terrainData.terrainCubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = Random.Range(0.0f, 1.0f);
-                    if (treeRoll <= 0.15) {
+                    if (treeRoll <= treeSpawnChance) {
                         spawnTree(terrainData.terrainCubes[z, x]);
                     }
                 }

@@ -5,6 +5,7 @@ using UnityEngine;
 
 using Terrain;
 using Cubes;
+using System.Runtime.InteropServices;
 
 public class Environment : MonoBehaviour
 {
@@ -40,7 +41,10 @@ public class Environment : MonoBehaviour
         GameObject moverObject = Instantiate(moverPrefab, start.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         Mover moverScript = moverObject.GetComponent<Mover>();
 
-        moverScript.currentPath = createPath(start, end);
+        List<Cubes.TerrainCube> path = createPath(start, end);
+        if (path != null) {
+            moverScript.currentPath = path;
+        }
     }
 
     public Terrain.TerrainData getTerrainData() {
@@ -107,6 +111,11 @@ public class Environment : MonoBehaviour
             }
 
             currentNode = getClosestNode(unvisited);
+
+            if (currentNode == null) {
+                print("No possible path");
+                return null;
+            }
             whileIncrement++;
         }
 
@@ -185,6 +194,10 @@ public class Environment : MonoBehaviour
                 bestNode = nodeSet[i];
                 bestWeight = bestNode.weight;
             }
+        }
+
+        if (bestWeight == Mathf.Infinity) {
+            return null;
         }
 
         return bestNode;
