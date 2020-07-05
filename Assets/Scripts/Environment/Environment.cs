@@ -18,11 +18,12 @@ public class Environment : MonoBehaviour
     public Material neighbourMaterial;
     public Material pathMaterial;
 
+    public int chunkSize;
     public float animationDelay;
 
     void Start() {
         var grassTerrain = FindObjectOfType<GrassTerrain>();
-        terrainData = grassTerrain.Generate(10);
+        terrainData = grassTerrain.Generate(chunkSize);
 
         TerrainCube start = terrainData.randomCube();
         TerrainCube end = terrainData.randomCube();
