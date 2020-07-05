@@ -1339,6 +1339,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   treePrefab: {fileID: 5377376025468098663, guid: 06f6e3ceb0ca2c84eb904898eb8d8880,
     type: 3}
+  treeSpawnChance: 0
+  riverSpawnChance: 1
 --- !u!4 &273982517
 Transform:
   m_ObjectHideFlags: 0
@@ -1387,6 +1389,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grassPrefab: {fileID: 7117533388567003772, guid: b5cbd650cf567234ba50af726d20d4e6,
     type: 3}
+  riverPrefab: {fileID: 0}
 --- !u!1 &315011911
 GameObject:
   m_ObjectHideFlags: 0

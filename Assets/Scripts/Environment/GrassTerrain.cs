@@ -5,6 +5,8 @@ using UnityEngine;
 using Cubes;
 using System.Security.Cryptography;
 using System.Collections.Specialized;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Terrain {
 
@@ -12,6 +14,7 @@ namespace Terrain {
 
         public Transform treePrefab;
         public float treeSpawnChance;
+        public float riverSpawnChance;
 
         public TerrainData Generate(int size) {
             TerrainData terrainData = new TerrainData(size);
@@ -21,11 +24,23 @@ namespace Terrain {
                 for (int x = 0; x < size; x++) {
                     terrainData.terrainCubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
                      
-                    float treeRoll = Random.Range(0.0f, 1.0f);
+                    float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
                     if (treeRoll <= treeSpawnChance) {
                         spawnTree(terrainData.terrainCubes[z, x]);
                     }
                 }
+            }
+
+            float riverRoll = UnityEngine.Random.Range(0.0f, 1.0f);
+            if (riverRoll <= riverSpawnChance) {
+                Cubes.TerrainCube start = terrainData.randomCube();
+                Cubes.TerrainCube end = terrainData.randomCube();
+
+                while (start.worldObject == end.worldObject) {
+                    end = terrainData.randomCube();
+                }
+
+                spawnRiver(start, end, terrainData);
             }
 
             return terrainData;
@@ -34,6 +49,81 @@ namespace Terrain {
         public void spawnTree(Cubes.TerrainCube cube) {
             cube.containedObject = Instantiate(treePrefab, cube.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
             cube.isWalkable = false;
+        }
+
+        public void spawnRiver(Cubes.TerrainCube start, Cubes.TerrainCube end, TerrainData terrainData) {
+            Vector3[] riverPath = bresenhamPath(start, end);
+            GameObject floorObject = GameObject.Find("/Floor/");
+
+            foreach (Vector3 point in riverPath) {
+                Cubes.TerrainCube cube = terrainData.terrainCubes[(int) point.z, (int) point.x];
+                cube.destroyCube();
+                terrainData.terrainCubes[cube.zPos, cube.xPos] = new RiverCube(cube.xPos, cube.zPos, floorObject);
+            }
+        }
+
+        private Vector3[] bresenhamPath (Cubes.TerrainCube start, Cubes.TerrainCube end) {
+            int x = start.xPos;
+            int z = start.zPos;
+            int x2 = end.xPos;
+            int z2 = end.zPos;
+
+            int w = x2 - x;
+            int h = z2 - z;
+            int w_Abs = Mathf.Abs(w);
+            int h_Abs = Mathf.Abs(h);
+
+            int dx_v = 0, dz_v = 0; // Vertical movement
+            int dx_h = 0, dz_h = 0; // Horizontal movement
+
+            if (w > 0) { // end is right of start, so move forwards
+                dx_v = 1;
+                dx_h = 1;
+            } else if (w < 0) { // end is left of start, so move backwards
+                dx_v = -1;
+                dx_h = -1;
+            }
+
+            if (h > 0) { // end is above start, so move upwards
+                dz_v = 1;
+            } else if (h < 0) { // end is below start, so move downwards
+                dz_v = -1;
+            }
+
+            int longEdge = Mathf.Max(w_Abs, h_Abs);
+            int shortEdge = Mathf.Min(w_Abs, h_Abs);
+
+            if (longEdge == h_Abs) { // Change horizontal movement, as width < height
+                dx_h = 0;
+
+                if (h > 0) {
+                    dz_h = 1;
+                } else if (h < 0) {
+                    dz_h = -1;
+                }
+            }
+
+            Vector3[] path = new Vector3[longEdge + 1];
+            path[0] = new Vector3(x, 0, z);
+
+            int offset = longEdge >> 1; // Half longEdge rounded down
+
+            for (int i = 1; i <= longEdge; i++) {
+                offset += shortEdge;
+
+                if (offset >= longEdge) { //Move vertically
+                    offset -= longEdge;
+                    x += dx_v;
+                    z += dz_v;
+                } else { //Move horizontally
+                    x += dx_h;
+                    z += dz_h;
+                }
+
+                path[i] = new Vector3(x, 0, z);
+            }
+
+            return path;
         }
     }
 
@@ -44,6 +134,10 @@ namespace Terrain {
         public TerrainData(int size) {
             this.size = size;
             terrainCubes = new TerrainCube[size, size];
+        }
+
+        public Cubes.TerrainCube randomCube() {
+            return terrainCubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
         }
     }
 }

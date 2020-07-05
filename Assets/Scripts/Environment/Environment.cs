@@ -24,15 +24,15 @@ public class Environment : MonoBehaviour
         var grassTerrain = FindObjectOfType<GrassTerrain>();
         terrainData = grassTerrain.Generate(10);
 
-        TerrainCube start = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
-        TerrainCube end = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
+        TerrainCube start = terrainData.randomCube();
+        TerrainCube end = terrainData.randomCube();
 
-        while (start.isWalkable == false) {
-            start = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
+        while (!start.isWalkable) {
+            start = terrainData.randomCube();
         }
 
-        while (end.isWalkable == false) {
-            end = terrainData.terrainCubes[UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(0, 10)];
+        while (!end.isWalkable || start.worldObject == end.worldObject) {
+            end = terrainData.randomCube();
         }
 
         start.setMaterial(startMaterial);

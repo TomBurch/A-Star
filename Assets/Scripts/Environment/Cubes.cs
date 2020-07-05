@@ -6,26 +6,23 @@ using UnityEngine;
 
 namespace Cubes {
 
-    public class Cubes : MonoBehaviour
-    {
+    public class Cubes : MonoBehaviour {
         public static Cubes Instance;
         public Transform grassPrefab;
+        public Transform riverPrefab;
 
-        void Awake()
-        {
+        void Awake() {
             Instance = this;
         }
     }
 
-    public class TerrainCube : MonoBehaviour
-    {
+    public class TerrainCube : MonoBehaviour {
         public bool isWalkable;
         public GameObject containedObject;
         public GameObject worldObject;
         public int xPos, zPos;
 
-        public TerrainCube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name)
-        {
+        public TerrainCube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
             this.containedObject = null;
             this.isWalkable = isWalkable;
             this.xPos = xPos;
@@ -48,12 +45,26 @@ namespace Cubes {
             yield return new WaitForSeconds(delay);
             worldObject.GetComponent<MeshRenderer>().material = newMaterial;
         }
+
+        public void clearCube() {
+            if (containedObject != null) {
+                Destroy(containedObject);
+                containedObject = null;
+                isWalkable = true;
+            }
+        }
+
+        public void destroyCube() {
+            clearCube();
+            Destroy(worldObject);
+        }
     }
 
-    public class GrassCube : TerrainCube
-    {
-        public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, Cubes.Instance.grassPrefab, parent, name)
-        {
-        }
+    public class GrassCube : TerrainCube {
+        public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, Cubes.Instance.grassPrefab, parent, name) { }
+    }
+
+    public class RiverCube : TerrainCube {
+        public RiverCube(int xPos, int zPos, GameObject parent, string name = "RiverCube") : base(xPos, zPos, true, Cubes.Instance.riverPrefab, parent, name) { }
     }
 }
