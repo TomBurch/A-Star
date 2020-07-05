@@ -90,9 +90,14 @@ public class Environment : MonoBehaviour
                     StartCoroutine(neighbour.terrainCube.setMaterialAfterDelay(neighbourMaterial, animationDelay * whileIncrement));
                 }
 
-                float newWeight = getWeight(start, target, neighbour);
-                if (newWeight < neighbour.weight) {
-                    neighbour.weight = newWeight;
+                //Dijkstra's -> f = g + speedModifier
+                //float tentativeWeight = currentNode.weight + neighbour.terrainCube.speedModifier;
+
+                //A* manhattan -> f = g + speedModifier + h
+                float tentativeWeight = currentNode.weight + neighbour.terrainCube.speedModifier + manhattan(neighbour, target);
+
+                if (tentativeWeight < neighbour.weight) {
+                    neighbour.weight = tentativeWeight;
                     neighbour.previousNode = currentNode;
                 }
             }
@@ -136,12 +141,8 @@ public class Environment : MonoBehaviour
         return path;
     }
 
-    private float getWeight(Cubes.TerrainCube start, Cubes.TerrainCube target, Node node) {
-        //Dijkstra's manhattan
-        //return (Mathf.Abs(start.xPos - node.terrainCube.xPos) + Mathf.Abs(start.zPos - node.terrainCube.zPos));
-
-        //A* manhattan/manhattan
-        return (Mathf.Abs(start.xPos - node.terrainCube.xPos) + Mathf.Abs(start.zPos - node.terrainCube.zPos)) + (Mathf.Abs(target.xPos - node.terrainCube.xPos) + Mathf.Abs(target.zPos - node.terrainCube.zPos));
+    private float manhattan(Node node, Cubes.TerrainCube target) {
+        return (Mathf.Abs(target.xPos - node.terrainCube.xPos) + Mathf.Abs(target.zPos - node.terrainCube.zPos));
     }
 
     private List<Node> getNeighbours(Node centerNode, List<List<Node>> grid) {

@@ -17,14 +17,16 @@ namespace Cubes {
     }
 
     public class TerrainCube : MonoBehaviour {
+        public float speedModifier;
         public bool isWalkable;
         public GameObject containedObject;
         public GameObject worldObject;
         public int xPos, zPos;
 
-        public TerrainCube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
+        public TerrainCube(int xPos, int zPos, bool isWalkable, float speedModifier, Transform prefab, GameObject parent, string name) {
             this.containedObject = null;
             this.isWalkable = isWalkable;
+            this.speedModifier = speedModifier;
             this.xPos = xPos;
             this.zPos = zPos;
 
@@ -61,10 +63,10 @@ namespace Cubes {
     }
 
     public class GrassCube : TerrainCube {
-        public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, Cubes.Instance.grassPrefab, parent, name) { }
+        public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, 1, Cubes.Instance.grassPrefab, parent, name) { }
     }
 
     public class RiverCube : TerrainCube {
-        public RiverCube(int xPos, int zPos, GameObject parent, string name = "RiverCube") : base(xPos, zPos, true, Cubes.Instance.riverPrefab, parent, name) { }
+        public RiverCube(int xPos, int zPos, GameObject parent, string name = "RiverCube") : base(xPos, zPos, true, 2, Cubes.Instance.riverPrefab, parent, name) { }
     }
 }

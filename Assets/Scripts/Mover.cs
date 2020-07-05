@@ -8,25 +8,26 @@ using Cubes;
 public class Mover : MonoBehaviour
 {
     Environment environment;
-    float lastMovementTime;
+    float nextMovementTime;
     float movementSpeed = 0.2f;
 
     public List<Cubes.TerrainCube> currentPath = new List<Cubes.TerrainCube>();
 
     void Start() {
         environment = FindObjectOfType<Environment>();
-        lastMovementTime = Time.time;
+        nextMovementTime = Time.time;
     }
 
     void Update() {
         if (currentPath.Count == 0) { return; }
 
         float currentTime = Time.time;
-        if (currentTime - lastMovementTime >= movementSpeed) {
+        if (currentTime > nextMovementTime) {
+            float travelTime = currentPath[0].speedModifier * movementSpeed;
             move(currentPath[0]);
             currentPath.RemoveAt(0);
 
-            lastMovementTime = Time.time;
+            nextMovementTime = Time.time + travelTime;
         }
     }
 
