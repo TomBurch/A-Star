@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Terrain;
+using Terrains;
 using Cubes;
 using System.Runtime.InteropServices;
 
 public class Environment : MonoBehaviour
 {
-    Terrain.TerrainData terrainData;
+    Terrains.TerrainData terrainData;
     public Transform moverPrefab;
 
     public Material startMaterial;
@@ -22,11 +22,11 @@ public class Environment : MonoBehaviour
     public float animationDelay;
 
     void Start() {
-        var grassTerrain = FindObjectOfType<GrassTerrain>();
+        var grassTerrain = FindObjectOfType<Region>();
         terrainData = grassTerrain.Generate(chunkSize);
 
-        TerrainCube start = terrainData.randomCube();
-        TerrainCube end = terrainData.randomCube();
+        Cube start = terrainData.randomCube();
+        Cube end = terrainData.randomCube();
 
         while (!start.isWalkable) {
             start = terrainData.randomCube();
@@ -36,36 +36,36 @@ public class Environment : MonoBehaviour
             end = terrainData.randomCube();
         }
 
-        start.setMaterial(startMaterial);
-        end.setMaterial(endMaterial);
+        CubeUtility.setMaterial(start, startMaterial);
+        CubeUtility.setMaterial(end, endMaterial);
 
-        GameObject moverObject = Instantiate(moverPrefab, start.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         Mover moverScript = moverObject.GetComponent<Mover>();
 
-        List<Cubes.TerrainCube> path = createPath(start, end);
+        List<Cube> path = createPath(start, end);
         if (path != null) {
             moverScript.currentPath = path;
         }
     }
 
-    public Terrain.TerrainData getTerrainData() {
+    public Terrains.TerrainData getTerrainData() {
         return terrainData;
     }
 
-    public List<Cubes.TerrainCube> createPath(Cubes.TerrainCube start, Cubes.TerrainCube target) {
+    public List<Cube> createPath(Cube start, Cube target) {
         List<List<Node>> grid = new List<List<Node>>();
         List<Node> unvisited = new List<Node>();
         List<Node> visited = new List<Node>();
-        List<Cubes.TerrainCube> path = new List<Cubes.TerrainCube>();
+        List<Cube> path = new List<Cube>();
         Node currentNode = null;
 
-        // Wrap each TerrainCube into a Node (giving it a weight variable)
+        // Wrap each Cube into a Node (giving it a weight variable)
         // Assign all nodes as 0 (start) or infinity
         for (int z = 0; z < terrainData.size; z++) {
             List<Node> row = new List<Node>();
 
             for (int x = 0; x < terrainData.size; x++) {
-                Cubes.TerrainCube cube = terrainData.terrainCubes[z, x];
+                Cube cube = terrainData.cubes[z, x];
 
                 if (cube.worldObject != start.worldObject) {
                     Node newNode = new Node(cube, Mathf.Infinity);
@@ -87,15 +87,15 @@ public class Environment : MonoBehaviour
             List<Node> neighbours = getNeighbours(currentNode, grid);
 
             foreach (Node neighbour in neighbours) {
-                if ((neighbour.terrainCube.worldObject != start.worldObject) && neighbour.terrainCube.worldObject != target.worldObject) {
-                    StartCoroutine(neighbour.terrainCube.setMaterialAfterDelay(neighbourMaterial, animationDelay * whileIncrement));
+                if ((neighbour.cube.worldObject != start.worldObject) && neighbour.cube.worldObject != target.worldObject) {
+                    StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbour.cube, neighbourMaterial, animationDelay * whileIncrement));
                 }
 
                 //Dijkstra's -> f = g + speedModifier
-                //float tentativeWeight = currentNode.weight + neighbour.terrainCube.speedModifier;
+                //float tentativeWeight = currentNode.weight + neighbour.cube.speedModifier;
 
                 //A* manhattan -> f = g + speedModifier + h
-                float tentativeWeight = currentNode.weight + neighbour.terrainCube.speedModifier + manhattan(neighbour, target);
+                float tentativeWeight = currentNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour, target);
 
                 if (tentativeWeight < neighbour.weight) {
                     neighbour.weight = tentativeWeight;
@@ -107,11 +107,11 @@ public class Environment : MonoBehaviour
             visited.Add(currentNode);
             currentNode.visited = true;
 
-            if ((currentNode.terrainCube.worldObject != start.worldObject) && currentNode.terrainCube.worldObject != target.worldObject) {
-                StartCoroutine(currentNode.terrainCube.setMaterialAfterDelay(visitedMaterial, animationDelay * whileIncrement));
+            if ((currentNode.cube.worldObject != start.worldObject) && currentNode.cube.worldObject != target.worldObject) {
+                StartCoroutine(CubeUtility.setMaterialAfterDelay(currentNode.cube, visitedMaterial, animationDelay * whileIncrement));
             }
 
-            if (currentNode.terrainCube.worldObject == target.worldObject) {
+            if (currentNode.cube.worldObject == target.worldObject) {
                 print("Target reached");
                 break;
             }
@@ -127,12 +127,12 @@ public class Environment : MonoBehaviour
 
         Node tailNode = currentNode;
         int pathIncrement = 1;
-        path.Add(currentNode.terrainCube);
+        path.Add(currentNode.cube);
 
         while (tailNode.previousNode != null) {
-            if (tailNode.previousNode.terrainCube.worldObject != start.worldObject) {
-                StartCoroutine(tailNode.previousNode.terrainCube.setMaterialAfterDelay(pathMaterial, (animationDelay * whileIncrement) + (animationDelay * pathIncrement)));
-                path.Add(tailNode.previousNode.terrainCube);
+            if (tailNode.previousNode.cube.worldObject != start.worldObject) {
+                StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.previousNode.cube, pathMaterial, (animationDelay * whileIncrement) + (animationDelay * pathIncrement)));
+                path.Add(tailNode.previousNode.cube);
             }
             tailNode = tailNode.previousNode;
             pathIncrement++;
@@ -142,20 +142,20 @@ public class Environment : MonoBehaviour
         return path;
     }
 
-    private float manhattan(Node node, Cubes.TerrainCube target) {
-        return (Mathf.Abs(target.xPos - node.terrainCube.xPos) + Mathf.Abs(target.zPos - node.terrainCube.zPos));
+    private float manhattan(Node node, Cube target) {
+        return (Mathf.Abs(target.xPos - node.cube.xPos) + Mathf.Abs(target.zPos - node.cube.zPos));
     }
 
     private List<Node> getNeighbours(Node centerNode, List<List<Node>> grid) {
         List<Node> neighbours = new List<Node>();
 
-        int centerX = centerNode.terrainCube.xPos;
-        int centerZ = centerNode.terrainCube.zPos;
+        int centerX = centerNode.cube.xPos;
+        int centerZ = centerNode.cube.zPos;
 
         if ((centerX - 1) >= 0) {
             Node neighbourNode = grid[centerZ][centerX - 1];
 
-            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
+            if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -163,7 +163,7 @@ public class Environment : MonoBehaviour
         if ((centerZ - 1) >= 0) {
             Node neighbourNode = grid[centerZ - 1][centerX];
 
-            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
+            if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -171,7 +171,7 @@ public class Environment : MonoBehaviour
         if ((centerX + 1) <= terrainData.size - 1) {
             Node neighbourNode = grid[centerZ][centerX + 1];
 
-            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
+            if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -179,7 +179,7 @@ public class Environment : MonoBehaviour
         if ((centerZ + 1) <= terrainData.size - 1) {
             Node neighbourNode = grid[centerZ + 1][centerX];
 
-            if (!neighbourNode.visited && neighbourNode.terrainCube.isWalkable == true) {
+            if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
                 neighbours.Add(neighbourNode);
             }
         }
@@ -209,11 +209,11 @@ public class Environment : MonoBehaviour
         public float weight;
         public bool visited;
         public Node previousNode;
-        public Cubes.TerrainCube terrainCube;
+        public Cube cube;
 
-        public Node(Cubes.TerrainCube terrainCube, float weight) {
+        public Node(Cube cube, float weight) {
             this.weight = weight;
-            this.terrainCube = terrainCube;
+            this.cube = cube;
             this.visited = false;
             this.previousNode = null;
         }

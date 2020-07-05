@@ -8,9 +8,9 @@ using System.Collections.Specialized;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Terrain {
+namespace Terrains {
 
-    public class GrassTerrain : MonoBehaviour {
+    public class Region : MonoBehaviour {
 
         public Transform treePrefab;
         public float treeSpawnChance;
@@ -22,19 +22,19 @@ namespace Terrain {
 
             for (int z = 0; z < size; z++) {
                 for (int x = 0; x < size; x++) {
-                    terrainData.terrainCubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
+                    terrainData.cubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
                     if (treeRoll <= treeSpawnChance) {
-                        spawnTree(terrainData.terrainCubes[z, x]);
+                        spawnTree(terrainData.cubes[z, x]);
                     }
                 }
             }
 
             float riverRoll = UnityEngine.Random.Range(0.0f, 1.0f);
             if (riverRoll <= riverSpawnChance) {
-                Cubes.TerrainCube start = terrainData.randomCube();
-                Cubes.TerrainCube end = terrainData.randomCube();
+                Cube start = terrainData.randomCube();
+                Cube end = terrainData.randomCube();
 
                 while (start.worldObject == end.worldObject) {
                     end = terrainData.randomCube();
@@ -46,23 +46,23 @@ namespace Terrain {
             return terrainData;
         }
 
-        public void spawnTree(Cubes.TerrainCube cube) {
-            cube.containedObject = Instantiate(treePrefab, cube.getPos() + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        public void spawnTree(Cube cube) {
+            cube.containedObject = Instantiate(treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
             cube.isWalkable = false;
         }
 
-        public void spawnRiver(Cubes.TerrainCube start, Cubes.TerrainCube end, TerrainData terrainData) {
+        public void spawnRiver(Cube start, Cube end, TerrainData terrainData) {
             List<Vector3> riverPath = bresenhamPath(start, end);
             GameObject floorObject = GameObject.Find("/Floor/");
 
             foreach (Vector3 point in riverPath) {
-                Cubes.TerrainCube cube = terrainData.terrainCubes[(int) point.z, (int) point.x];
-                cube.destroyCube();
-                terrainData.terrainCubes[cube.zPos, cube.xPos] = new RiverCube(cube.xPos, cube.zPos, floorObject);
+                Cube cube = terrainData.cubes[(int) point.z, (int) point.x];
+                CubeUtility.destroyCube(cube);
+                terrainData.cubes[cube.zPos, cube.xPos] = new RiverCube(cube.xPos, cube.zPos, floorObject);
             }
         }
 
-        private List<Vector3> bresenhamPath (Cubes.TerrainCube start, Cubes.TerrainCube end) {
+        private List<Vector3> bresenhamPath (Cube start, Cube end) {
             int x = start.xPos;
             int z = start.zPos;
             int x2 = end.xPos;
@@ -134,15 +134,15 @@ namespace Terrain {
 
     public class TerrainData {
         public int size;
-        public TerrainCube[,] terrainCubes;
+        public Cube[,] cubes;
 
         public TerrainData(int size) {
             this.size = size;
-            terrainCubes = new TerrainCube[size, size];
+            cubes = new Cube[size, size];
         }
 
-        public Cubes.TerrainCube randomCube() {
-            return terrainCubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
+        public Cube randomCube() {
+            return cubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
         }
     }
 }
