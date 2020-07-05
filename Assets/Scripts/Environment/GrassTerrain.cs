@@ -52,7 +52,7 @@ namespace Terrain {
         }
 
         public void spawnRiver(Cubes.TerrainCube start, Cubes.TerrainCube end, TerrainData terrainData) {
-            Vector3[] riverPath = bresenhamPath(start, end);
+            List<Vector3> riverPath = bresenhamPath(start, end);
             GameObject floorObject = GameObject.Find("/Floor/");
 
             foreach (Vector3 point in riverPath) {
@@ -62,7 +62,7 @@ namespace Terrain {
             }
         }
 
-        private Vector3[] bresenhamPath (Cubes.TerrainCube start, Cubes.TerrainCube end) {
+        private List<Vector3> bresenhamPath (Cubes.TerrainCube start, Cubes.TerrainCube end) {
             int x = start.xPos;
             int z = start.zPos;
             int x2 = end.xPos;
@@ -103,10 +103,13 @@ namespace Terrain {
                 }
             }
 
-            Vector3[] path = new Vector3[longEdge + 1];
-            path[0] = new Vector3(x, 0, z);
+            //Vector3[] path = new Vector3[longEdge + 1];
+            List<Vector3> path = new List<Vector3>();
+            path.Add(new Vector3(x, 0, z));
 
             int offset = longEdge >> 1; // Half longEdge rounded down
+            int prev_dx = dx_h;
+            int prev_dz = dz_h;
 
             for (int i = 1; i <= longEdge; i++) {
                 offset += shortEdge;
@@ -115,12 +118,14 @@ namespace Terrain {
                     offset -= longEdge;
                     x += dx_v;
                     z += dz_v;
+
+                    path.Add(new Vector3(x - dx_v + dx_h, 0, z - dz_v + dz_h)); //Fill in gaps to have fully connected line
                 } else { //Move horizontally
                     x += dx_h;
                     z += dz_h;
                 }
 
-                path[i] = new Vector3(x, 0, z);
+                path.Add(new Vector3(x, 0, z));
             }
 
             return path;
