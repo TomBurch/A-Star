@@ -8,57 +8,75 @@ using System.Collections.Specialized;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Terrains {
+namespace Regions {
 
-    public class Region : MonoBehaviour {
+    public class RegionUtility : MonoBehaviour {
+        public static RegionUtility Instance;
 
         public Transform treePrefab;
         public float treeSpawnChance;
         public float riverSpawnChance;
 
-        public TerrainData Generate(int size) {
-            TerrainData terrainData = new TerrainData(size);
+        void Awake() {
+            Instance = this;
+        }
+    }
+
+    public class Region : MonoBehaviour {
+        public int size;
+        public Cube[,] cubes;
+
+        public Region(int size) {
+            this.size = size;
+        }
+
+        public Region Generate() {
             GameObject floorObject = GameObject.Find("/Floor/");
+            cubes = new Cube[size, size];
 
             for (int z = 0; z < size; z++) {
                 for (int x = 0; x < size; x++) {
-                    terrainData.cubes[z, x] = new GrassCube(x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
+                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
-                    if (treeRoll <= treeSpawnChance) {
-                        spawnTree(terrainData.cubes[z, x]);
+                    if (treeRoll <= RegionUtility.Instance.treeSpawnChance) {
+                        spawnTree(cubes[z, x]);
                     }
                 }
             }
 
             float riverRoll = UnityEngine.Random.Range(0.0f, 1.0f);
-            if (riverRoll <= riverSpawnChance) {
-                Cube start = terrainData.randomCube();
-                Cube end = terrainData.randomCube();
+            if (riverRoll <= RegionUtility.Instance.riverSpawnChance) {
+                Cube start = randomCube();
+                Cube end = randomCube();
 
                 while (start.worldObject == end.worldObject) {
-                    end = terrainData.randomCube();
+                    end = randomCube();
                 }
 
-                spawnRiver(start, end, terrainData);
+                spawnRiver(start, end);
             }
 
-            return terrainData;
+            return this;
+        }
+
+        public Cube randomCube() {
+            return cubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
         }
 
         public void spawnTree(Cube cube) {
-            cube.containedObject = Instantiate(treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+            cube.containedObject = Instantiate(RegionUtility.Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
             cube.isWalkable = false;
         }
 
-        public void spawnRiver(Cube start, Cube end, TerrainData terrainData) {
+        public void spawnRiver(Cube start, Cube end) {
             List<Vector3> riverPath = bresenhamPath(start, end);
             GameObject floorObject = GameObject.Find("/Floor/");
 
             foreach (Vector3 point in riverPath) {
-                Cube cube = terrainData.cubes[(int) point.z, (int) point.x];
+                Cube cube = cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                terrainData.cubes[cube.zPos, cube.xPos] = new RiverCube(cube.xPos, cube.zPos, floorObject);
+                cubes[cube.zPos, cube.xPos] = CubeUtility.newCube("RiverCube", cube.xPos, cube.zPos, floorObject);
             }
         }
 
@@ -103,7 +121,6 @@ namespace Terrains {
                 }
             }
 
-            //Vector3[] path = new Vector3[longEdge + 1];
             List<Vector3> path = new List<Vector3>();
             path.Add(new Vector3(x, 0, z));
 
@@ -129,20 +146,6 @@ namespace Terrains {
             }
 
             return path;
-        }
-    }
-
-    public class TerrainData {
-        public int size;
-        public Cube[,] cubes;
-
-        public TerrainData(int size) {
-            this.size = size;
-            cubes = new Cube[size, size];
-        }
-
-        public Cube randomCube() {
-            return cubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
         }
     }
 }

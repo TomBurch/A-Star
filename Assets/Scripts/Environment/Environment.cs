@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Terrains;
+using Regions;
 using Cubes;
 using System.Runtime.InteropServices;
 
 public class Environment : MonoBehaviour
 {
-    Terrains.TerrainData terrainData;
+    Region region;
     public Transform moverPrefab;
 
     public Material startMaterial;
@@ -21,19 +21,23 @@ public class Environment : MonoBehaviour
     public int chunkSize;
     public float animationDelay;
 
-    void Start() {
-        var grassTerrain = FindObjectOfType<Region>();
-        terrainData = grassTerrain.Generate(chunkSize);
+    public Region[,] regions;
 
-        Cube start = terrainData.randomCube();
-        Cube end = terrainData.randomCube();
+    void Start() {
+        UnityEngine.Random.InitState(67);
+
+        var grassTerrain = FindObjectOfType<Region>();
+        region = new Region(chunkSize).Generate();
+
+        Cube start = region.randomCube();
+        Cube end = region.randomCube();
 
         while (!start.isWalkable) {
-            start = terrainData.randomCube();
+            start = region.randomCube();
         }
 
         while (!end.isWalkable || start.worldObject == end.worldObject) {
-            end = terrainData.randomCube();
+            end = region.randomCube();
         }
 
         CubeUtility.setMaterial(start, startMaterial);
@@ -48,8 +52,8 @@ public class Environment : MonoBehaviour
         }
     }
 
-    public Terrains.TerrainData getTerrainData() {
-        return terrainData;
+    public Region getTerrainData() {
+        return region;
     }
 
     public List<Cube> createPath(Cube start, Cube target) {
@@ -61,11 +65,11 @@ public class Environment : MonoBehaviour
 
         // Wrap each Cube into a Node (giving it a weight variable)
         // Assign all nodes as 0 (start) or infinity
-        for (int z = 0; z < terrainData.size; z++) {
+        for (int z = 0; z < region.size; z++) {
             List<Node> row = new List<Node>();
 
-            for (int x = 0; x < terrainData.size; x++) {
-                Cube cube = terrainData.cubes[z, x];
+            for (int x = 0; x < region.size; x++) {
+                Cube cube = region.cubes[z, x];
 
                 if (cube.worldObject != start.worldObject) {
                     Node newNode = new Node(cube, Mathf.Infinity);
@@ -168,7 +172,7 @@ public class Environment : MonoBehaviour
             }
         }
 
-        if ((centerX + 1) <= terrainData.size - 1) {
+        if ((centerX + 1) <= region.size - 1) {
             Node neighbourNode = grid[centerZ][centerX + 1];
 
             if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
@@ -176,7 +180,7 @@ public class Environment : MonoBehaviour
             }
         }
 
-        if ((centerZ + 1) <= terrainData.size - 1) {
+        if ((centerZ + 1) <= region.size - 1) {
             Node neighbourNode = grid[centerZ + 1][centerX];
 
             if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {

@@ -9,6 +9,7 @@ namespace Cubes {
 
     public class CubeUtility : MonoBehaviour {
         public static CubeUtility Instance;
+
         public Transform grassPrefab;
         public Transform riverPrefab;
 
@@ -35,8 +36,7 @@ namespace Cubes {
         }
 
         public static void clearCube(Cube cube) {
-            if (cube.containedObject != null)
-            {
+            if (cube.containedObject != null) {
                 Destroy(cube.containedObject);
                 cube.containedObject = null;
                 cube.isWalkable = true;
@@ -47,23 +47,38 @@ namespace Cubes {
             clearCube(cube);
             Destroy(cube.worldObject);
         }
+
+        public static Cube newCube(string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
+            Cube cube = null;
+
+            switch (cubeType) {
+                case "GrassCube": cube = new GrassCube(xPos, zPos, parent, name);
+                    break;
+                case "RiverCube": cube = new RiverCube(xPos, zPos, parent, name);
+                    break;
+            }
+        
+            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos * 1f, 0f, zPos * 1f), Quaternion.identity, parent.transform);
+            cubeObject.name = name;
+            cube.worldObject = cubeObject.gameObject;
+
+            return cube;
+        }
     }
 
-    public class Cube : MonoBehaviour {
+    public class Cube {
         public bool isWalkable;
         public GameObject containedObject;
         public GameObject worldObject;
         public int xPos, zPos;
+        public Transform prefab;
 
         public Cube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
             this.containedObject = null;
             this.isWalkable = isWalkable;
             this.xPos = xPos;
             this.zPos = zPos;
-
-            Transform newCube = Instantiate(prefab, new Vector3(xPos * 1f, 0f, zPos * 1f), Quaternion.identity, parent.transform);
-            newCube.name = name;
-            this.worldObject = newCube.gameObject;
+            this.prefab = prefab;
         }
     }
 

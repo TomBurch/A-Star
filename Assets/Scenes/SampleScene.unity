@@ -1337,6 +1337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7d2af523d987344d9c6c1ca9c09cfd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  size: 0
   treePrefab: {fileID: 5377376025468098663, guid: 06f6e3ceb0ca2c84eb904898eb8d8880,
     type: 3}
   treeSpawnChance: 0.35
@@ -1374,7 +1375,7 @@ MonoBehaviour:
   visitedMaterial: {fileID: 2100000, guid: 1e335a84d3a020640b39de2ac78c8e43, type: 2}
   neighbourMaterial: {fileID: 2100000, guid: 5920f3a01bb5a2f4090812ed123bb278, type: 2}
   pathMaterial: {fileID: 2100000, guid: 51e7a823d4fc59a4997ef106fc7c761b, type: 2}
-  chunkSize: 100
+  chunkSize: 10
   animationDelay: 0.05
 --- !u!114 &273982519
 MonoBehaviour:
