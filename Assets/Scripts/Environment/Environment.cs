@@ -26,18 +26,18 @@ public class Environment : MonoBehaviour
     void Start() {
         UnityEngine.Random.InitState(67);
 
-        var grassTerrain = FindObjectOfType<Region>();
-        region = new Region(chunkSize).Generate();
+        region = new Region(chunkSize);
+        region.Generate();
 
-        Cube start = region.randomCube();
-        Cube end = region.randomCube();
+        Cube start = RegionUtility.randomCube(region);
+        Cube end = RegionUtility.randomCube(region);
 
         while (!start.isWalkable) {
-            start = region.randomCube();
+            start = RegionUtility.randomCube(region);
         }
 
         while (!end.isWalkable || start.worldObject == end.worldObject) {
-            end = region.randomCube();
+            end = RegionUtility.randomCube(region);
         }
 
         CubeUtility.setMaterial(start, startMaterial);
@@ -50,10 +50,6 @@ public class Environment : MonoBehaviour
         if (path != null) {
             moverScript.currentPath = path;
         }
-    }
-
-    public Region getTerrainData() {
-        return region;
     }
 
     public List<Cube> createPath(Cube start, Cube target) {

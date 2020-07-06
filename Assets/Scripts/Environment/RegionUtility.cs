@@ -20,67 +20,28 @@ namespace Regions {
         void Awake() {
             Instance = this;
         }
-    }
 
-    public class Region : MonoBehaviour {
-        public int size;
-        public Cube[,] cubes;
-
-        public Region(int size) {
-            this.size = size;
+        public static Cube randomCube(Region region) {
+            return region.cubes[UnityEngine.Random.Range(0, region.size), UnityEngine.Random.Range(0, region.size)];
         }
 
-        public Region Generate() {
-            GameObject floorObject = GameObject.Find("/Floor/");
-            cubes = new Cube[size, size];
-
-            for (int z = 0; z < size; z++) {
-                for (int x = 0; x < size; x++) {
-                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
-                     
-                    float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
-                    if (treeRoll <= RegionUtility.Instance.treeSpawnChance) {
-                        spawnTree(cubes[z, x]);
-                    }
-                }
-            }
-
-            float riverRoll = UnityEngine.Random.Range(0.0f, 1.0f);
-            if (riverRoll <= RegionUtility.Instance.riverSpawnChance) {
-                Cube start = randomCube();
-                Cube end = randomCube();
-
-                while (start.worldObject == end.worldObject) {
-                    end = randomCube();
-                }
-
-                spawnRiver(start, end);
-            }
-
-            return this;
-        }
-
-        public Cube randomCube() {
-            return cubes[UnityEngine.Random.Range(0, size), UnityEngine.Random.Range(0, size)];
-        }
-
-        public void spawnTree(Cube cube) {
-            cube.containedObject = Instantiate(RegionUtility.Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        public static void spawnTree(Cube cube) {
+            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
             cube.isWalkable = false;
         }
 
-        public void spawnRiver(Cube start, Cube end) {
+        public static void spawnRiver(Region region, Cube start, Cube end) {
             List<Vector3> riverPath = bresenhamPath(start, end);
             GameObject floorObject = GameObject.Find("/Floor/");
 
             foreach (Vector3 point in riverPath) {
-                Cube cube = cubes[(int) point.z, (int) point.x];
+                Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                cubes[cube.zPos, cube.xPos] = CubeUtility.newCube("RiverCube", cube.xPos, cube.zPos, floorObject);
+                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube("RiverCube", cube.xPos, cube.zPos, floorObject);
             }
         }
 
-        private List<Vector3> bresenhamPath (Cube start, Cube end) {
+        private static List<Vector3> bresenhamPath(Cube start, Cube end) {
             int x = start.xPos;
             int z = start.zPos;
             int x2 = end.xPos;
@@ -97,14 +58,16 @@ namespace Regions {
             if (w > 0) { // end is right of start, so move forwards
                 dx_v = 1;
                 dx_h = 1;
-            } else if (w < 0) { // end is left of start, so move backwards
+            }
+            else if (w < 0) { // end is left of start, so move backwards
                 dx_v = -1;
                 dx_h = -1;
             }
 
             if (h > 0) { // end is above start, so move upwards
                 dz_v = 1;
-            } else if (h < 0) { // end is below start, so move downwards
+            }
+            else if (h < 0) { // end is below start, so move downwards
                 dz_v = -1;
             }
 
@@ -116,7 +79,8 @@ namespace Regions {
 
                 if (h > 0) {
                     dz_h = 1;
-                } else if (h < 0) {
+                }
+                else if (h < 0) {
                     dz_h = -1;
                 }
             }
@@ -137,7 +101,8 @@ namespace Regions {
                     z += dz_v;
 
                     path.Add(new Vector3(x - dx_v + dx_h, 0, z - dz_v + dz_h)); //Fill in gaps to have fully connected line
-                } else { //Move horizontally
+                }
+                else { //Move horizontally
                     x += dx_h;
                     z += dz_h;
                 }
@@ -147,6 +112,43 @@ namespace Regions {
 
             return path;
         }
+    }
+
+    public class Region {
+        public int size;
+        public Cube[,] cubes;
+
+        public Region(int size) {
+            this.size = size;
+        }
+
+        public void Generate() {
+            GameObject floorObject = GameObject.Find("/Floor/");
+            cubes = new Cube[size, size];
+
+            for (int z = 0; z < size; z++) {
+                for (int x = 0; x < size; x++) {
+                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
+                     
+                    float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
+                    if (treeRoll <= RegionUtility.Instance.treeSpawnChance) {
+                        RegionUtility.spawnTree(cubes[z, x]);
+                    }
+                }
+            }
+
+            float riverRoll = UnityEngine.Random.Range(0.0f, 1.0f);
+            if (riverRoll <= RegionUtility.Instance.riverSpawnChance) {
+                Cube start = RegionUtility.randomCube(this);
+                Cube end = RegionUtility.randomCube(this);
+
+                while (start.worldObject == end.worldObject) {
+                    end = RegionUtility.randomCube(this);
+                }
+
+                RegionUtility.spawnRiver(this, start, end);
+            }
+        } 
     }
 }
 
