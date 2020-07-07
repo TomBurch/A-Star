@@ -5,16 +5,13 @@ using UnityEngine;
 using Regions;
 using Cubes;
 
-public class Mover : MonoBehaviour
-{
-    Environment environment;
+public class Mover : MonoBehaviour {
     float nextMovementTime;
     float movementSpeed = 0.2f;
 
     public List<Cube> currentPath = new List<Cube>();
 
     void Start() {
-        environment = FindObjectOfType<Environment>();
         nextMovementTime = Time.time;
     }
 

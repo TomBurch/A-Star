@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Worlds;
 using Regions;
 using Cubes;
-using System.Runtime.InteropServices;
 
-public class Environment : MonoBehaviour {
-    Region region;
+public class Setup : MonoBehaviour {
     public Transform moverPrefab;
-    public int chunkSize;
-
-    public Region[,] regions;
+    public int worldSize;
 
     void Start() {
         UnityEngine.Random.InitState(67);
 
         AStar astar = (AStar) FindObjectOfType(typeof(AStar));
-        region = new Region(chunkSize);
+        World world = new World(worldSize);
+        Region region = new Region(100);
         region.Generate();
 
         Cube start = RegionUtility.randomCube(region);
