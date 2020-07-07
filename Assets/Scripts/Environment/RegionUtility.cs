@@ -26,7 +26,7 @@ namespace Regions {
         }
 
         public static void spawnTree(Cube cube) {
-            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity, cube.worldObject.transform).gameObject;
             cube.isWalkable = false;
         }
 
@@ -116,19 +116,20 @@ namespace Regions {
 
     public class Region {
         public int size;
+        public GameObject container;
         public Cube[,] cubes;
 
-        public Region(int size) {
+        public Region(int size, GameObject container) {
             this.size = size;
+            this.container = container;
         }
 
         public void Generate() {
-            GameObject floorObject = GameObject.Find("/Floor/");
             cubes = new Cube[size, size];
 
             for (int z = 0; z < size; z++) {
                 for (int x = 0; x < size; x++) {
-                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, floorObject, string.Format("{0}-{1}-{2}", x, 1, z));
+                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
                     if (treeRoll <= RegionUtility.Instance.treeSpawnChance) {
