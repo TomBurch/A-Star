@@ -16,6 +16,10 @@ namespace Worlds {
         void Awake() {
             Instance = this;
         }
+
+        public static Region randomRegion(World world) {
+            return world.regions[UnityEngine.Random.Range(0, world.size), UnityEngine.Random.Range(0, world.size)];
+        }
     }
 
     public class World {
