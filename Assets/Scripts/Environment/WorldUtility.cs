@@ -86,33 +86,22 @@ namespace Worlds {
 
         List<Portal> getPortals(RegionNode[,] grid, Region region) {
             List<Portal> portals = new List<Portal>();
-            RegionNode neighbour;
 
-            if ((region.xPos - 1) >= 0) {
-                checkLeftColumn(grid, region, portals);
-            }
-
-            if ((region.zPos - 1) >= 0) {
-                checkBottomRow(grid, region, portals);
-            }
-
-            if ((region.xPos + 1) <= grid.GetLength(1) - 1) {
-                checkRightColumn(grid, region, portals);
-            }
-
-            if ((region.zPos + 1) <= grid.GetLength(0) - 1) {
-                checkTopRow(grid, region, portals);
-            }
+            checkLeftColumn(grid, region, portals);
+            checkBottomRow(grid, region, portals);
+            checkRightColumn(grid, region, portals);
+            checkTopRow(grid, region, portals);
 
             foreach (Portal portal in portals) {
                 CubeUtility.setMaterial(portal.entrance, WorldUtility.Instance.portalMaterial);
-                CubeUtility.setMaterial(portal.exit, WorldUtility.Instance.portalMaterial);
             }
 
             return portals;
         }
         
         void checkRightColumn(RegionNode[,] grid, Region region, List<Portal> portals) {
+            if (!((region.xPos + 1) <= grid.GetLength(1) - 1)) { return; }
+
             RegionNode neighbour = grid[region.zPos, region.xPos + 1];
             List<Cube> adjacentCubes = new List<Cube>();
 
@@ -140,6 +129,8 @@ namespace Worlds {
         }
 
         void checkTopRow(RegionNode[,] grid, Region region, List<Portal> portals) {
+            if (!((region.zPos + 1) <= grid.GetLength(0) - 1)) { return; }
+
             RegionNode neighbour = grid[region.zPos + 1, region.xPos];
             List<Cube> adjacentCubes = new List<Cube>();
 
@@ -167,6 +158,8 @@ namespace Worlds {
         }
     
         void checkBottomRow(RegionNode[,] grid, Region region, List<Portal> portals) {
+            if (!((region.zPos - 1) >= 0)) { return; }
+
             RegionNode neighbour = grid[region.zPos - 1, region.xPos];
             List<Cube> adjacentCubes = new List<Cube>();
 
@@ -194,6 +187,8 @@ namespace Worlds {
         }
 
         void checkLeftColumn(RegionNode[,] grid, Region region, List<Portal> portals) {
+            if (!((region.xPos - 1) >= 0)) { return; }
+
             RegionNode neighbour = grid[region.zPos, region.xPos - 1];
             List<Cube> adjacentCubes = new List<Cube>();
 
