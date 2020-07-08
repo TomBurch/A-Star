@@ -32,12 +32,11 @@ namespace Regions {
 
         public static void spawnRiver(Region region, Cube start, Cube end) {
             List<Vector3> riverPath = bresenhamPath(start, end);
-            GameObject floorObject = GameObject.Find("/Floor/");
 
             foreach (Vector3 point in riverPath) {
                 Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, floorObject);
+                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, region.container, string.Format("{0}-{1}-{2}", cube.xPos, 1, cube.zPos));
             }
         }
 
