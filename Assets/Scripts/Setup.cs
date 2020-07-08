@@ -33,9 +33,9 @@ public class Setup : MonoBehaviour {
         GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         Mover moverScript = moverObject.GetComponent<Mover>();
 
-        List<Cube> path = astar.createPath(region, start, end);
-        if (path != null) {
-            moverScript.currentPath = path;
-        }
+        //List<Cube> path = astar.createPath(region, start, end);
+        //if (path != null) {
+        //    moverScript.currentPath = path;
+        //}
     }
 }
