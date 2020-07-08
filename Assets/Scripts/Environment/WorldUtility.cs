@@ -38,8 +38,7 @@ namespace Worlds {
                     GameObject regionContainer = new GameObject(string.Format("{0}-{1}-{2}", x, 1, z));
                     regionContainer.transform.parent = container.transform;
 
-                    regions[z, x] = new Region(WorldUtility.Instance.regionSize, regionContainer);
-                    regions[z, x].Generate();
+                    regions[z, x] = new Region(WorldUtility.Instance.regionSize, x, z, regionContainer);
                 }
             }
         }

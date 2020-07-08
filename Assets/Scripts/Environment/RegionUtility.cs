@@ -37,7 +37,7 @@ namespace Regions {
             foreach (Vector3 point in riverPath) {
                 Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube("RiverCube", cube.xPos, cube.zPos, floorObject);
+                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, floorObject);
             }
         }
 
@@ -117,19 +117,24 @@ namespace Regions {
     public class Region {
         public int size;
         public GameObject container;
+        public int xPos, zPos;
         public Cube[,] cubes;
 
-        public Region(int size, GameObject container) {
+        public Region(int size, int xPos, int zPos, GameObject container) {
             this.size = size;
+            this.xPos = xPos;
+            this.zPos = zPos;
             this.container = container;
+
+            Generate();
         }
 
-        public void Generate() {
+        private void Generate() {
             cubes = new Cube[size, size];
 
             for (int z = 0; z < size; z++) {
                 for (int x = 0; x < size; x++) {
-                    cubes[z, x] = CubeUtility.newCube("GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
+                    cubes[z, x] = CubeUtility.newCube(this, "GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);
                     if (treeRoll <= RegionUtility.Instance.treeSpawnChance) {

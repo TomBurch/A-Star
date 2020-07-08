@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Security.Cryptography;
 using UnityEngine;
 
+using Regions;
+
 namespace Cubes {
 
     public class CubeUtility : MonoBehaviour {
@@ -48,7 +50,7 @@ namespace Cubes {
             Destroy(cube.worldObject);
         }
 
-        public static Cube newCube(string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
+        public static Cube newCube(Region region, string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
             Cube cube = null;
 
             switch (cubeType) {
@@ -58,7 +60,7 @@ namespace Cubes {
                     break;
             }
         
-            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos * 1f, 0f, zPos * 1f), Quaternion.identity, parent.transform);
+            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos + (region.size * region.xPos), 0f, zPos + (region.size * region.zPos)), Quaternion.identity, parent.transform);
             cubeObject.name = name;
             cube.worldObject = cubeObject.gameObject;
 

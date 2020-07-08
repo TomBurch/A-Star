@@ -1315,6 +1315,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 273982517}
+  - component: {fileID: 273982521}
   - component: {fileID: 273982518}
   - component: {fileID: 273982516}
   - component: {fileID: 273982519}
@@ -1368,9 +1369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70464557ff2001446a7d9d9190a7d05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
-    type: 3}
-  chunkSize: 10
+  regionSize: 10
 --- !u!114 &273982519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1405,6 +1404,21 @@ MonoBehaviour:
   neighbourMaterial: {fileID: 2100000, guid: 5920f3a01bb5a2f4090812ed123bb278, type: 2}
   pathMaterial: {fileID: 2100000, guid: 51e7a823d4fc59a4997ef106fc7c761b, type: 2}
   animationDelay: 0.05
+--- !u!114 &273982521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273982515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549968aea2524574f99c795f99ff8fc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
+    type: 3}
+  worldSize: 20
 --- !u!1 &315011911
 GameObject:
   m_ObjectHideFlags: 0
