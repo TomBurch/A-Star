@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Cubes;
-using System.Security.Cryptography;
+using Worlds;
 using System.Collections.Specialized;
 using System;
-using System.Runtime.InteropServices;
 
 namespace Regions {
 
@@ -115,22 +114,23 @@ namespace Regions {
 
     public class Region {
         public int size;
-        public GameObject container;
         public int xPos, zPos;
+        public World world;
+        public GameObject container;
         public Cube[,] cubes;
 
-        public Region(int size, int xPos, int zPos, GameObject container) {
+        public Region(int size, int xPos, int zPos, World world, GameObject container) {
             this.size = size;
             this.xPos = xPos;
             this.zPos = zPos;
+            this.world = world;
             this.container = container;
+            this.cubes = new Cube[size, size];
 
             Generate();
         }
 
         private void Generate() {
-            cubes = new Cube[size, size];
-
             for (int z = 0; z < size; z++) {
                 for (int x = 0; x < size; x++) {
                     cubes[z, x] = CubeUtility.newCube(this, "GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
