@@ -202,14 +202,6 @@ public class AStar : MonoBehaviour {
 /// ///////
 /// </summary>
 
-    class RegionNode {
-        public Region region;
-
-        public RegionNode(Region region) {
-            this.region = region;
-        }
-    }
-
     class Portal {
         public Cube entrance;
         public Cube exit;
@@ -223,26 +215,18 @@ public class AStar : MonoBehaviour {
     }
 
     public void createAbstractGraph(World world) {
-        RegionNode[,] grid = new RegionNode[world.size, world.size];
-
-        for (int z = 0; z < world.size; z++) {
-            for (int x = 0; x < world.size; x++) {
-                grid[z, x] = new RegionNode(world.regions[z, x]);
-            }
-        }
-
         AStar astar = (AStar)FindObjectOfType(typeof(AStar));
 
         List<Portal> allPortals = new List<Portal>();
 
-        foreach (RegionNode node in grid) {
-            List<Portal> portals = getPortals(grid, node.region);
+        foreach (Region region in world.regions) {
+            List<Portal> portals = getPortals(world, region);
 
             for (int i = 0; i < portals.Count - 1; i++) {
                 foreach (Portal portal in portals.GetRange(i + 1, portals.Count - (i + 1))) {
                     if (portal == portals[i]) { continue; }
 
-                    CubePath path = astar.createPath(node.region, portals[i].entrance, portal.entrance);
+                    CubePath path = astar.createPath(region, portals[i].entrance, portal.entrance);
                     if (path != null) {
                         portals[i].arcs.Add(portal, path.distance);
                         portal.arcs.Add(portals[i], path.distance);
@@ -259,26 +243,26 @@ public class AStar : MonoBehaviour {
         }
     }
 
-    List<Portal> getPortals(RegionNode[,] grid, Region region) {
+    List<Portal> getPortals(World world, Region region) {
         List<Portal> portals = new List<Portal>();
 
-        checkLeftColumn(grid, region, portals);
-        checkBottomRow(grid, region, portals);
-        checkRightColumn(grid, region, portals);
-        checkTopRow(grid, region, portals);
+        checkLeftColumn(world, region, portals);
+        checkBottomRow(world, region, portals);
+        checkRightColumn(world, region, portals);
+        checkTopRow(world, region, portals);
 
         return portals;
     }
 
-    void checkRightColumn(RegionNode[,] grid, Region region, List<Portal> portals) {
-        if (!((region.xPos + 1) <= grid.GetLength(1) - 1)) { return; }
+    void checkRightColumn(World world, Region region, List<Portal> portals) {
+        if (!((region.xPos + 1) <= world.regions.GetLength(1) - 1)) { return; }
 
-        RegionNode neighbour = grid[region.zPos, region.xPos + 1];
+        Region neighbour = world.regions[region.zPos, region.xPos + 1];
         List<Cube> adjacentCubes = new List<Cube>();
 
         for (int z = 0; z < region.size; z++) {
             Cube regionCube = region.cubes[z, region.size - 1];
-            Cube neighbourCube = neighbour.region.cubes[z, 0];
+            Cube neighbourCube = neighbour.cubes[z, 0];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
@@ -291,7 +275,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.region.cubes[regionCube.zPos, 0];
+                neighbourCube = neighbour.cubes[regionCube.zPos, 0];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -299,15 +283,15 @@ public class AStar : MonoBehaviour {
         }
     }
 
-    void checkTopRow(RegionNode[,] grid, Region region, List<Portal> portals) {
-        if (!((region.zPos + 1) <= grid.GetLength(0) - 1)) { return; }
+    void checkTopRow(World world, Region region, List<Portal> portals) {
+        if (!((region.zPos + 1) <= world.regions.GetLength(0) - 1)) { return; }
 
-        RegionNode neighbour = grid[region.zPos + 1, region.xPos];
+        Region neighbour = world.regions[region.zPos + 1, region.xPos];
         List<Cube> adjacentCubes = new List<Cube>();
 
         for (int x = 0; x < region.size; x++) {
             Cube regionCube = region.cubes[region.size - 1, x];
-            Cube neighbourCube = neighbour.region.cubes[0, x];
+            Cube neighbourCube = neighbour.cubes[0, x];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
@@ -320,7 +304,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.region.cubes[0, regionCube.xPos];
+                neighbourCube = neighbour.cubes[0, regionCube.xPos];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -328,15 +312,15 @@ public class AStar : MonoBehaviour {
         }
     }
 
-    void checkBottomRow(RegionNode[,] grid, Region region, List<Portal> portals) {
+    void checkBottomRow(World world, Region region, List<Portal> portals) {
         if (!((region.zPos - 1) >= 0)) { return; }
 
-        RegionNode neighbour = grid[region.zPos - 1, region.xPos];
+        Region neighbour = world.regions[region.zPos - 1, region.xPos];
         List<Cube> adjacentCubes = new List<Cube>();
 
         for (int x = 0; x < region.size; x++) {
             Cube regionCube = region.cubes[0, x];
-            Cube neighbourCube = neighbour.region.cubes[region.size - 1, x];
+            Cube neighbourCube = neighbour.cubes[region.size - 1, x];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
@@ -349,7 +333,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.region.cubes[region.size - 1, regionCube.xPos];
+                neighbourCube = neighbour.cubes[region.size - 1, regionCube.xPos];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -357,15 +341,15 @@ public class AStar : MonoBehaviour {
         }
     }
 
-    void checkLeftColumn(RegionNode[,] grid, Region region, List<Portal> portals) {
+    void checkLeftColumn(World world, Region region, List<Portal> portals) {
         if (!((region.xPos - 1) >= 0)) { return; }
 
-        RegionNode neighbour = grid[region.zPos, region.xPos - 1];
+        Region neighbour = world.regions[region.zPos, region.xPos - 1];
         List<Cube> adjacentCubes = new List<Cube>();
 
         for (int z = 0; z < region.size; z++) {
             Cube regionCube = region.cubes[z, 0];
-            Cube neighbourCube = neighbour.region.cubes[z, region.size - 1];
+            Cube neighbourCube = neighbour.cubes[z, region.size - 1];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
@@ -378,7 +362,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.region.cubes[regionCube.zPos, region.size - 1];
+                neighbourCube = neighbour.cubes[regionCube.zPos, region.size - 1];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
