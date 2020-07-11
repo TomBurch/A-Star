@@ -54,9 +54,9 @@ namespace Cubes {
             Cube cube = null;
 
             switch (cubeType) {
-                case "GrassCube": cube = new GrassCube(xPos, zPos, parent, name);
+                case "GrassCube": cube = new GrassCube(xPos, zPos, region, parent, name);
                     break;
-                case "RiverCube": cube = new RiverCube(xPos, zPos, parent, name);
+                case "RiverCube": cube = new RiverCube(xPos, zPos, region, parent, name);
                     break;
             }
         
@@ -69,26 +69,28 @@ namespace Cubes {
     }
 
     public class Cube {
+        public int xPos, zPos;
+        public Region region;
         public bool isWalkable;
+        public Transform prefab;
         public GameObject containedObject;
         public GameObject worldObject;
-        public int xPos, zPos;
-        public Transform prefab;
 
-        public Cube(int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
-            this.containedObject = null;
-            this.isWalkable = isWalkable;
+        public Cube(int xPos, int zPos, Region region, bool isWalkable, Transform prefab, GameObject parent, string name) {
             this.xPos = xPos;
             this.zPos = zPos;
+            this.region = region;
+            this.isWalkable = isWalkable;
             this.prefab = prefab;
+            this.containedObject = null;
         }
     }
 
     public class GrassCube : Cube {
-        public GrassCube(int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(xPos, zPos, true, CubeUtility.Instance.grassPrefab, parent, name) { }
+        public GrassCube(int xPos, int zPos, Region region, GameObject parent, string name = "GrassCube") : base(xPos, zPos, region, true, CubeUtility.Instance.grassPrefab, parent, name) { }
     }
 
     public class RiverCube : Cube {
-        public RiverCube(int xPos, int zPos, GameObject parent, string name = "RiverCube") : base(xPos, zPos, true, CubeUtility.Instance.riverPrefab, parent, name) { }
+        public RiverCube(int xPos, int zPos, Region region, GameObject parent, string name = "RiverCube") : base(xPos, zPos, region, true, CubeUtility.Instance.riverPrefab, parent, name) { }
     }
 }

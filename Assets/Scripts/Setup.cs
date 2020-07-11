@@ -16,7 +16,9 @@ public class Setup : MonoBehaviour {
         GameObject worldContainer = new GameObject("World");
         World world = new World(worldSize, worldContainer);
 
-        AStar astar = (AStar)FindObjectOfType(typeof(AStar));
+        AStar astar = (AStar) FindObjectOfType(typeof(AStar));
+        astar.createAbstractGraph(world);
+
         Region region = WorldUtility.randomRegion(world);
 
         Cube start = RegionUtility.randomCube(region);

@@ -1369,6 +1369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70464557ff2001446a7d9d9190a7d05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  portalMaterial: {fileID: 2100000, guid: eab13fcb19ea46a479081781e00515b2, type: 2}
+  entranceMaterial: {fileID: 2100000, guid: f9969ea40be67d34fb459cbf937e8a70, type: 2}
   regionSize: 10
 --- !u!114 &273982519
 MonoBehaviour:
@@ -1403,7 +1405,7 @@ MonoBehaviour:
   visitedMaterial: {fileID: 2100000, guid: 1e335a84d3a020640b39de2ac78c8e43, type: 2}
   neighbourMaterial: {fileID: 2100000, guid: 5920f3a01bb5a2f4090812ed123bb278, type: 2}
   pathMaterial: {fileID: 2100000, guid: 51e7a823d4fc59a4997ef106fc7c761b, type: 2}
-  animationDelay: 0.05
+  animationDelay: 0
 --- !u!114 &273982521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1418,7 +1420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
     type: 3}
-  worldSize: 20
+  worldSize: 5
 --- !u!1 &315011911
 GameObject:
   m_ObjectHideFlags: 0
@@ -9804,6 +9806,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3220614401623209156, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
+        type: 3}
+      propertyPath: m_Name
+      value: Adam
+      objectReference: {fileID: 0}
+    - target: {fileID: 3220614401623209156, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -9857,16 +9869,6 @@ PrefabInstance:
     - target: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3220614401623209156, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
-        type: 3}
-      propertyPath: m_Name
-      value: Adam
-      objectReference: {fileID: 0}
-    - target: {fileID: 3220614401623209156, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
-        type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3220614401623209154, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
