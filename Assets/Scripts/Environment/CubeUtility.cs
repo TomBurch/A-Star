@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using UnityEngine;
 
 using Regions;
+using Worlds;
 
 namespace Cubes {
 
@@ -60,7 +61,7 @@ namespace Cubes {
                     break;
             }
         
-            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos + (region.size * region.xPos), 0f, zPos + (region.size * region.zPos)), Quaternion.identity, parent.transform);
+            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos + (WorldUtility.Instance.regionSize * region.xPos), 0f, zPos + (WorldUtility.Instance.regionSize * region.zPos)), Quaternion.identity, parent.transform);
             cubeObject.name = name;
             cube.worldObject = cubeObject.gameObject;
 

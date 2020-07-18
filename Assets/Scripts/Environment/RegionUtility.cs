@@ -21,7 +21,7 @@ namespace Regions {
         }
 
         public static Cube randomCube(Region region) {
-            return region.cubes[UnityEngine.Random.Range(0, region.size), UnityEngine.Random.Range(0, region.size)];
+            return region.cubes[UnityEngine.Random.Range(0, WorldUtility.Instance.regionSize), UnityEngine.Random.Range(0, WorldUtility.Instance.regionSize)];
         }
 
         public static void spawnTree(Cube cube) {
@@ -113,26 +113,24 @@ namespace Regions {
     }
 
     public class Region {
-        public int size;
         public int xPos, zPos;
         public World world;
         public GameObject container;
         public Cube[,] cubes;
 
-        public Region(int size, int xPos, int zPos, World world, GameObject container) {
-            this.size = size;
+        public Region(int xPos, int zPos, World world, GameObject container) {
             this.xPos = xPos;
             this.zPos = zPos;
             this.world = world;
             this.container = container;
-            this.cubes = new Cube[size, size];
+            this.cubes = new Cube[WorldUtility.Instance.regionSize, WorldUtility.Instance.regionSize];
 
             Generate();
         }
 
         private void Generate() {
-            for (int z = 0; z < size; z++) {
-                for (int x = 0; x < size; x++) {
+            for (int z = 0; z < WorldUtility.Instance.regionSize; z++) {
+                for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
                     cubes[z, x] = CubeUtility.newCube(this, "GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
                      
                     float treeRoll = UnityEngine.Random.Range(0.0f, 1.0f);

@@ -26,10 +26,10 @@ public class AStar : MonoBehaviour {
 
         // Wrap each Cube into a Node (giving it a weight variable)
         // Assign all nodes as 0 (start) or infinity
-        for (int z = 0; z < region.size; z++) {
+        for (int z = 0; z < WorldUtility.Instance.regionSize; z++) {
             List<Node> row = new List<Node>();
 
-            for (int x = 0; x < region.size; x++) {
+            for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
                 Cube cube = region.cubes[z, x];
 
                 if (cube.worldObject != start.worldObject) {
@@ -257,16 +257,17 @@ public class AStar : MonoBehaviour {
 
         Region neighbour = region.world.regions[region.zPos, region.xPos + 1];
         List<Cube> adjacentCubes = new List<Cube>();
+        int regionSize = WorldUtility.Instance.regionSize;
 
-        for (int z = 0; z < region.size; z++) {
-            Cube regionCube = region.cubes[z, region.size - 1];
+        for (int z = 0; z < regionSize; z++) {
+            Cube regionCube = region.cubes[z, regionSize - 1];
             Cube neighbourCube = neighbour.cubes[z, 0];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
                 CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
 
-                if (z != region.size - 1) {
+                if (z != regionSize - 1) {
                     continue;
                 }
             }
@@ -286,16 +287,17 @@ public class AStar : MonoBehaviour {
 
         Region neighbour = region.world.regions[region.zPos + 1, region.xPos];
         List<Cube> adjacentCubes = new List<Cube>();
+        int regionSize = WorldUtility.Instance.regionSize;
 
-        for (int x = 0; x < region.size; x++) {
-            Cube regionCube = region.cubes[region.size - 1, x];
+        for (int x = 0; x < regionSize; x++) {
+            Cube regionCube = region.cubes[regionSize - 1, x];
             Cube neighbourCube = neighbour.cubes[0, x];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
                 CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
 
-                if (x != region.size - 1) {
+                if (x != regionSize - 1) {
                     continue;
                 }
             }
@@ -315,23 +317,24 @@ public class AStar : MonoBehaviour {
 
         Region neighbour = region.world.regions[region.zPos - 1, region.xPos];
         List<Cube> adjacentCubes = new List<Cube>();
+        int regionSize = WorldUtility.Instance.regionSize;
 
-        for (int x = 0; x < region.size; x++) {
+        for (int x = 0; x < regionSize; x++) {
             Cube regionCube = region.cubes[0, x];
-            Cube neighbourCube = neighbour.cubes[region.size - 1, x];
+            Cube neighbourCube = neighbour.cubes[regionSize - 1, x];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
                 CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
 
-                if (x != region.size - 1) {
+                if (x != regionSize - 1) {
                     continue;
                 }
             }
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[region.size - 1, regionCube.xPos];
+                neighbourCube = neighbour.cubes[regionSize - 1, regionCube.xPos];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -344,23 +347,24 @@ public class AStar : MonoBehaviour {
 
         Region neighbour = region.world.regions[region.zPos, region.xPos - 1];
         List<Cube> adjacentCubes = new List<Cube>();
+        int regionSize = WorldUtility.Instance.regionSize;
 
-        for (int z = 0; z < region.size; z++) {
+        for (int z = 0; z < regionSize; z++) {
             Cube regionCube = region.cubes[z, 0];
-            Cube neighbourCube = neighbour.cubes[z, region.size - 1];
+            Cube neighbourCube = neighbour.cubes[z, regionSize - 1];
 
             if (regionCube.isWalkable && neighbourCube.isWalkable) {
                 adjacentCubes.Add(regionCube);
                 CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
 
-                if (z != region.size - 1) {
+                if (z != regionSize - 1) {
                     continue;
                 }
             }
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[regionCube.zPos, region.size - 1];
+                neighbourCube = neighbour.cubes[regionCube.zPos, regionSize - 1];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
