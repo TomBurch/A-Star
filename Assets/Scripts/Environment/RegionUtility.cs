@@ -35,15 +35,15 @@ namespace Regions {
             foreach (Vector3 point in riverPath) {
                 Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, region.container, string.Format("{0}-{1}-{2}", cube.xPos, 1, cube.zPos));
+                region.cubes[cube.l_zPos, cube.l_xPos] = CubeUtility.newCube(region, "RiverCube", cube.l_xPos, cube.l_zPos, region.container, string.Format("{0}-{1}-{2}", cube.l_xPos, 1, cube.l_zPos));
             }
         }
 
         private static List<Vector3> bresenhamPath(Cube start, Cube end) {
-            int x = start.xPos;
-            int z = start.zPos;
-            int x2 = end.xPos;
-            int z2 = end.zPos;
+            int x = start.l_xPos;
+            int z = start.l_zPos;
+            int x2 = end.l_xPos;
+            int z2 = end.l_zPos;
 
             int w = x2 - x;
             int h = z2 - z;
@@ -128,7 +128,7 @@ namespace Regions {
             Generate();
         }
 
-        private void Generate() {
+        public void Generate() {
             for (int z = 0; z < WorldUtility.Instance.regionSize; z++) {
                 for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
                     cubes[z, x] = CubeUtility.newCube(this, "GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));

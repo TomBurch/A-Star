@@ -51,17 +51,19 @@ namespace Cubes {
             Destroy(cube.worldObject);
         }
 
-        public static Cube newCube(Region region, string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
+        public static Cube newCube(Region region, string cubeType, int l_xPos, int l_zPos, GameObject parent, string name = "Cube") {
             Cube cube = null;
+            int g_xPos = l_xPos + (WorldUtility.Instance.regionSize * region.xPos);
+            int g_zPos = l_zPos + (WorldUtility.Instance.regionSize * region.zPos);
 
             switch (cubeType) {
-                case "GrassCube": cube = new GrassCube(xPos, zPos, region, parent, name);
+                case "GrassCube": cube = new GrassCube(g_xPos, g_zPos, region, l_xPos, l_zPos, parent, name);
                     break;
-                case "RiverCube": cube = new RiverCube(xPos, zPos, region, parent, name);
+                case "RiverCube": cube = new RiverCube(g_xPos, g_zPos, region, l_xPos, l_zPos, parent, name);
                     break;
             }
         
-            Transform cubeObject = Instantiate(cube.prefab, new Vector3(xPos + (WorldUtility.Instance.regionSize * region.xPos), 0f, zPos + (WorldUtility.Instance.regionSize * region.zPos)), Quaternion.identity, parent.transform);
+            Transform cubeObject = Instantiate(cube.prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform);
             cubeObject.name = name;
             cube.worldObject = cubeObject.gameObject;
 
@@ -70,17 +72,20 @@ namespace Cubes {
     }
 
     public class Cube {
-        public int xPos, zPos;
+        public int g_xPos, g_zPos;
+        public int l_xPos, l_zPos;
         public Region region;
         public bool isWalkable;
         public Transform prefab;
         public GameObject containedObject;
         public GameObject worldObject;
 
-        public Cube(int xPos, int zPos, Region region, bool isWalkable, Transform prefab, GameObject parent, string name) {
-            this.xPos = xPos;
-            this.zPos = zPos;
+        public Cube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
+            this.g_xPos = g_xPos;
+            this.g_zPos = g_zPos;
             this.region = region;
+            this.l_xPos = l_xPos;
+            this.l_zPos = l_zPos;
             this.isWalkable = isWalkable;
             this.prefab = prefab;
             this.containedObject = null;
@@ -88,10 +93,10 @@ namespace Cubes {
     }
 
     public class GrassCube : Cube {
-        public GrassCube(int xPos, int zPos, Region region, GameObject parent, string name = "GrassCube") : base(xPos, zPos, region, true, CubeUtility.Instance.grassPrefab, parent, name) { }
+        public GrassCube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, GameObject parent, string name = "GrassCube") : base(g_xPos, g_zPos, region, l_xPos, l_zPos, true, CubeUtility.Instance.grassPrefab, parent, name) { }
     }
 
     public class RiverCube : Cube {
-        public RiverCube(int xPos, int zPos, Region region, GameObject parent, string name = "RiverCube") : base(xPos, zPos, region, true, CubeUtility.Instance.riverPrefab, parent, name) { }
+        public RiverCube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, GameObject parent, string name = "RiverCube") : base(g_xPos, g_zPos, region, l_xPos, l_zPos, true, CubeUtility.Instance.riverPrefab, parent, name) { }
     }
 }

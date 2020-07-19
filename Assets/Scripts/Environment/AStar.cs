@@ -112,14 +112,14 @@ public class AStar : MonoBehaviour {
     }
 
     private float manhattan(Node node, Cube target) {
-        return (Mathf.Abs(target.xPos - node.cube.xPos) + Mathf.Abs(target.zPos - node.cube.zPos));
+        return (Mathf.Abs(target.l_xPos - node.cube.l_xPos) + Mathf.Abs(target.l_zPos - node.cube.l_zPos));
     }
 
     private List<Node> getNeighbours(Node centerNode, List<List<Node>> grid) {
         List<Node> neighbours = new List<Node>();
 
-        int centerX = centerNode.cube.xPos;
-        int centerZ = centerNode.cube.zPos;
+        int centerX = centerNode.cube.l_xPos;
+        int centerZ = centerNode.cube.l_zPos;
 
         if ((centerX - 1) >= 0) {
             Node neighbourNode = grid[centerZ][centerX - 1];
@@ -237,7 +237,7 @@ public class AStar : MonoBehaviour {
         foreach (Portal portal in allPortals) {
             CubeUtility.setMaterial(portal.entrance, WorldUtility.Instance.portalMaterial);
             CubeUtility.setMaterial(portal.exit, WorldUtility.Instance.portalMaterial);
-            print(portal.entrance.region.xPos + "," + portal.entrance.region.zPos + " - " + portal.entrance.xPos + "," + portal.entrance.zPos + " : " + portal.arcs.Count);
+            //print(portal.entrance.region.xPos + "," + portal.entrance.region.zPos + " - " + portal.entrance.xPos + "," + portal.entrance.zPos + " : " + portal.arcs.Count);
         }
     }
 
@@ -274,7 +274,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[regionCube.zPos, 0];
+                neighbourCube = neighbour.cubes[regionCube.l_zPos, 0];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -304,7 +304,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[0, regionCube.xPos];
+                neighbourCube = neighbour.cubes[0, regionCube.l_xPos];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -334,7 +334,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[regionSize - 1, regionCube.xPos];
+                neighbourCube = neighbour.cubes[regionSize - 1, regionCube.l_xPos];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();
@@ -364,7 +364,7 @@ public class AStar : MonoBehaviour {
 
             if (adjacentCubes.Count > 0) {
                 regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                neighbourCube = neighbour.cubes[regionCube.zPos, regionSize - 1];
+                neighbourCube = neighbour.cubes[regionCube.l_zPos, regionSize - 1];
 
                 portals.Add(new Portal(regionCube, neighbourCube));
                 adjacentCubes = new List<Cube>();

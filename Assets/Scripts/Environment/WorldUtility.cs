@@ -19,6 +19,13 @@ namespace Worlds {
             Instance = this;
         }
 
+        public static Cube getCube(World world, int x, int z) {
+            int regionX = (int) (x / Instance.regionSize);
+            int regionZ = (int) (z / Instance.regionSize);
+
+            return world.regions[regionZ, regionX].cubes[z - (Instance.regionSize * regionZ), x - (Instance.regionSize * regionX)];
+        }
+
         public static Region randomRegion(World world) {
             return world.regions[UnityEngine.Random.Range(0, world.size), UnityEngine.Random.Range(0, world.size)];
         }
