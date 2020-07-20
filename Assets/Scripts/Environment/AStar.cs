@@ -251,7 +251,6 @@ public class AStar : MonoBehaviour {
     }
 
     public List<AbstractNode> createAbstractPath(AbstractGraph graph, AbstractNode start, AbstractNode target) {
-        List<AbstractNode> path = new List<AbstractNode>();
         List<AbstractNode> unvisited = new List<AbstractNode>();
 
         CubeUtility.setMaterial(start.cube, startMaterial);
@@ -295,6 +294,20 @@ public class AStar : MonoBehaviour {
                 }
             }
         }
+
+        List<AbstractNode> path = new List<AbstractNode>();
+        AbstractNode tailNode = target;
+        int pathIncrement = 0;
+
+        while (tailNode != start) {
+            pathIncrement++;
+            StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, pathMaterial, (animationDelay * whileIncrement) + (animationDelay * pathIncrement)));
+
+            path.Insert(0, tailNode);
+            tailNode = tailNode.prevNode;
+        }
+
+        path.Remove(start);
 
         return path;
     }
