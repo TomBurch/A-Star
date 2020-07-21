@@ -1315,11 +1315,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 273982517}
+  - component: {fileID: 273982520}
   - component: {fileID: 273982521}
   - component: {fileID: 273982518}
   - component: {fileID: 273982516}
   - component: {fileID: 273982519}
-  - component: {fileID: 273982520}
   m_Layer: 0
   m_Name: EnvironmentGenerator
   m_TagString: Untagged
@@ -1397,7 +1397,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 273982515}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c2e4906f190af64ebfe8058cf5ba226, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d7de4c8102576b47976bdf6174f2566, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   startMaterial: {fileID: 2100000, guid: 026dd00ce504b0f41a5ee529e70a6762, type: 2}
@@ -1405,7 +1405,7 @@ MonoBehaviour:
   visitedMaterial: {fileID: 2100000, guid: 1e335a84d3a020640b39de2ac78c8e43, type: 2}
   neighbourMaterial: {fileID: 2100000, guid: 5920f3a01bb5a2f4090812ed123bb278, type: 2}
   pathMaterial: {fileID: 2100000, guid: 51e7a823d4fc59a4997ef106fc7c761b, type: 2}
-  animationDelay: 0.25
+  animationDelay: 0.0001
 --- !u!114 &273982521
 MonoBehaviour:
   m_ObjectHideFlags: 0
