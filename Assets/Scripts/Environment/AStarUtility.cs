@@ -34,8 +34,8 @@ namespace AStar {
                 List<Portal> portals = getPortals(region);
 
                 foreach (Portal portal in portals) {
-                    AbstractNode entrance = graph.addAbstractNode(portal.entrance, false);
-                    AbstractNode exit = graph.addAbstractNode(portal.exit, false);
+                    AbstractNode entrance = graph.addAbstractNode(portal.entrance);
+                    AbstractNode exit = graph.addAbstractNode(portal.exit);
 
                     entrance.arcs.Add(exit, 1f);
                     exit.arcs.Add(entrance, 1f);
@@ -348,19 +348,27 @@ namespace AStar {
             }
         }
 
-        public AbstractNode addAbstractNode(Cube cube, bool addArcs = true) {
+        public AbstractNode addAbstractNode(Cube cube, bool temporary = false) {
+            if (cube.worldObject.tag == "Node") { return getAbstractNode(cube); }
+
             AbstractNode newNode = new AbstractNode(cube);
             AbstractRegion region = this.regions[cube.region.zPos, cube.region.xPos];
 
             CubeUtility.setMaterial(cube, AStarUtility.Instance.portalMaterial);
 
-            if (addArcs) {
+            if (temporary) {
+                cube.worldObject.tag = "TempNode";
+
                 foreach (AbstractNode node in region.nodes) {
-                    //AStarUtility.print("Arc: " + newNode.cube.g_xPos + ", " + newNode.cube.g_zPos + " to " + node.cube.g_xPos + ", " + node.cube.g_zPos);
-                    float distance = AStarUtility.createPath(newNode.cube.region, newNode.cube, node.cube).distance;
-                    newNode.arcs.Add(node, distance);
-                    node.arcs.Add(newNode, distance);
+                    CubePath path = AStarUtility.createPath(newNode.cube.region, newNode.cube, node.cube);
+
+                    if (path != null) {
+                        newNode.arcs.Add(node, path.distance);
+                        node.arcs.Add(newNode, path.distance);
+                    }
                 }
+            } else {
+                cube.worldObject.tag = "Node";
             }
 
             this.nodes.Add(newNode);
@@ -370,17 +378,26 @@ namespace AStar {
         }
 
         public void removeAbstractNode(AbstractNode oldNode) {
+            if (oldNode.cube.worldObject.tag == "Node") { return; }
+            
             AbstractRegion region = this.regions[oldNode.cube.region.zPos, oldNode.cube.region.xPos];
             this.nodes.Remove(oldNode);
             region.nodes.Remove(oldNode);
             oldNode.arcs = null;
+            oldNode.cube.worldObject.tag = "Cube";
 
             foreach (AbstractNode node in region.nodes) {
                 node.arcs.Remove(oldNode);
             }
         }
 
-        public List<Cube> createAbstractPath(AbstractNode start, AbstractNode target, bool animate = false) {
+        public AbstractNode getAbstractNode(Cube cube) {
+            return this.nodes.Find(x => x.cube.worldObject == cube.worldObject);
+        }
+        
+        public List<Cube> createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
+            AbstractNode start = this.addAbstractNode(startCube, true);
+            AbstractNode target = this.addAbstractNode(targetCube, true);
             List<AbstractNode> unvisited = new List<AbstractNode>();
 
             if (animate) {
@@ -446,8 +463,12 @@ namespace AStar {
 
             path.Remove(start.cube);
 
+            this.removeAbstractNode(start);
+            this.removeAbstractNode(target);
+
             return path;
         }
+    
     }
 
     public class AbstractRegion {

@@ -12,7 +12,7 @@ public class Setup : MonoBehaviour {
     public int worldSize;
 
     void Start() {
-        UnityEngine.Random.InitState(60);
+        UnityEngine.Random.InitState(67);
 
         GameObject worldContainer = new GameObject("World");
         World world = new World(worldSize, worldContainer);
@@ -28,14 +28,11 @@ public class Setup : MonoBehaviour {
             end = WorldUtility.randomCube(world);
         }
 
-        AbstractNode startNode = world.graph.addAbstractNode(start);
-        AbstractNode endNode = world.graph.addAbstractNode(end);
-
         GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         Mover moverScript = moverObject.GetComponent<Mover>();
         moverScript.currentCube = start;
 
-        List<Cube> path = world.graph.createAbstractPath(startNode, endNode);
+        List<Cube> path = world.graph.createAbstractPath(start, end);
         if (path != null) {
             moverScript.currentPath = path;
         }
