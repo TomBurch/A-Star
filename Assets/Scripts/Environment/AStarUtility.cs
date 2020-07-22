@@ -61,6 +61,7 @@ namespace AStar {
         }
 
         public static CubePath createPath(Region region, Cube start, Cube target, bool animate = false) {
+            //print("Pathing from [" + start.g_xPos + ", " + start.g_zPos + "] to [" + target.g_xPos + ", " + target.g_zPos + "]");
             List<List<Node>> grid = new List<List<Node>>();
             List<Node> unvisited = new List<Node>();
             List<Node> visited = new List<Node>();
@@ -108,6 +109,7 @@ namespace AStar {
                     //float tentativeWeight = currentNode.weight + neighbour.cube.speedModifier;
 
                     //A* manhattan -> f = g + speedModifier + h
+                    //print("[" + currentNode.cube.g_xPos + ", " + currentNode.cube.g_zPos + "] [" + neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + "] g: " + currentNode.weight + " / speed: " + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + " / h: " + manhattan(neighbour.cube, target));
                     float tentativeWeight = currentNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour.cube, target);
 
                     if (tentativeWeight < neighbour.weight) {
@@ -174,18 +176,6 @@ namespace AStar {
             checkTopRow(region, portals);
 
             return portals;
-        }
-
-        public static AbstractNode getBestNode(List<AbstractNode> list) {
-            AbstractNode bestNode = list[0];
-
-            for (int i = 1; i < list.Count; i++) {
-                if (list[i].distance < bestNode.distance) {
-                    bestNode = list[i];
-                }
-            }
-
-            return bestNode;
         }
 
         static Node getClosestNode(List<Node> nodeSet) {
@@ -416,7 +406,11 @@ namespace AStar {
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
-                AbstractNode bestNode = AStarUtility.getBestNode(unvisited);
+                AbstractNode bestNode = this.getBestNode(unvisited);
+
+                if (bestNode == target) { break; }     // Path found
+                if (bestNode == null) { return null; } // No possible path
+
                 unvisited.Remove(bestNode);
 
                 if (animate) {
@@ -424,8 +418,6 @@ namespace AStar {
                         AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, AStarUtility.Instance.visitedMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
                     }
                 }
-
-                if (bestNode == target) { break; }
 
                 foreach (var arc in bestNode.arcs) {
                     AbstractNode neighbourNode = arc.Key;
@@ -468,7 +460,22 @@ namespace AStar {
 
             return path;
         }
-    
+
+        AbstractNode getBestNode(List<AbstractNode> list) {
+            AbstractNode bestNode = list[0];
+
+            for (int i = 1; i < list.Count; i++) {
+                if (list[i].distance < bestNode.distance) {
+                    bestNode = list[i];
+                }
+            }
+
+            if (bestNode.distance == Mathf.Infinity) {
+                return null;
+            }
+
+            return bestNode;
+        }
     }
 
     public class AbstractRegion {
