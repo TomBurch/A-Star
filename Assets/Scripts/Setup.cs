@@ -12,32 +12,30 @@ public class Setup : MonoBehaviour {
     public int worldSize;
 
     void Start() {
-        UnityEngine.Random.InitState(67);
+        UnityEngine.Random.InitState(60);
 
         GameObject worldContainer = new GameObject("World");
         World world = new World(worldSize, worldContainer);
 
-        //Region region = WorldUtility.randomRegion(world);
+        Cube start = WorldUtility.randomCube(world);
+        Cube end = WorldUtility.randomCube(world);
 
-        //Cube start = RegionUtility.randomCube(region);
-        //Cube end = RegionUtility.randomCube(region);
+        while (!start.isWalkable) {
+            start = WorldUtility.randomCube(world);
+        }
 
-        //while (!start.isWalkable) {
-        //    start = RegionUtility.randomCube(region);
-        //}
+        while (!end.isWalkable || start.worldObject == end.worldObject) {
+            end = WorldUtility.randomCube(world);
+        }
 
-        //while (!end.isWalkable || start.worldObject == end.worldObject) {
-        //    end = RegionUtility.randomCube(region);
-        //}
+        AbstractNode startNode = world.graph.addAbstractNode(start);
+        AbstractNode endNode = world.graph.addAbstractNode(end);
 
-        AbstractNode start = world.graph.nodes[0];
-        AbstractNode end = world.graph.nodes[world.graph.nodes.Count - 1];
-
-        GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start.cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         Mover moverScript = moverObject.GetComponent<Mover>();
-        moverScript.currentCube = start.cube;
+        moverScript.currentCube = start;
 
-        List<Cube> path = AStarUtility.createAbstractPath(world.graph, start, end);
+        List<Cube> path = world.graph.createAbstractPath(startNode, endNode);
         if (path != null) {
             moverScript.currentPath = path;
         }

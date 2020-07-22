@@ -16,6 +16,8 @@ namespace AStar {
         public Material visitedMaterial;
         public Material neighbourMaterial;
         public Material pathMaterial;
+        public Material portalMaterial;
+        public Material entranceMaterial;
 
         public float animationDelay;
 
@@ -32,20 +34,11 @@ namespace AStar {
                 List<Portal> portals = getPortals(region);
 
                 foreach (Portal portal in portals) {
-                    AbstractNode entranceNode = new AbstractNode(portal.entrance);
-                    AbstractNode exitNode = new AbstractNode(portal.exit);
+                    AbstractNode entrance = graph.addAbstractNode(portal.entrance, false);
+                    AbstractNode exit = graph.addAbstractNode(portal.exit, false);
 
-                    entranceNode.arcs.Add(exitNode, 1f);
-                    exitNode.arcs.Add(entranceNode, 1f);
-
-                    CubeUtility.setMaterial(portal.entrance, WorldUtility.Instance.portalMaterial);
-                    CubeUtility.setMaterial(portal.exit, WorldUtility.Instance.portalMaterial);
-
-                    graph.regions[portal.entrance.region.zPos, portal.entrance.region.xPos].nodes.Add(entranceNode);
-                    graph.regions[portal.exit.region.zPos, portal.exit.region.xPos].nodes.Add(exitNode);
-
-                    graph.nodes.Add(entranceNode);
-                    graph.nodes.Add(exitNode);
+                    entrance.arcs.Add(exit, 1f);
+                    exit.arcs.Add(entrance, 1f);
                 }
             }
 
@@ -55,7 +48,7 @@ namespace AStar {
                 for (int i = 0; i < region.nodes.Count - 1; i++) {
                     foreach (AbstractNode node in region.nodes.GetRange(i + 1, region.nodes.Count - (i + 1))) {
                         CubePath path = createPath(region.region, region.nodes[i].cube, node.cube);
-
+            
                         if (path != null) {
                             region.nodes[i].arcs.Add(node, path.distance);
                             node.arcs.Add(region.nodes[i], path.distance);
@@ -64,83 +57,7 @@ namespace AStar {
                 }
             }
 
-            //AbstractNode testNode = graph.nodes[0];
-            //AbstractNode testNode2 = graph.nodes[52];
-            //print("node1 = " + testNode.cube.g_xPos + ", " + testNode.cube.g_zPos);
-            //print("node2 = " + testNode2.cube.g_xPos + ", " + testNode2.cube.g_zPos);
-
-            //createAbstractPath(graph, testNode, testNode2);
-
             return graph;
-        }
-
-        public static List<Cube> createAbstractPath(AbstractGraph graph, AbstractNode start, AbstractNode target, bool animate = false) {
-            List<AbstractNode> unvisited = new List<AbstractNode>();
-
-            if (animate) {
-                CubeUtility.setMaterial(start.cube, Instance.startMaterial);
-                CubeUtility.setMaterial(target.cube, Instance.targetMaterial);
-            }
-
-            foreach (AbstractNode node in graph.nodes) {
-                node.distance = Mathf.Infinity;
-                node.prevNode = null;
-                unvisited.Add(node);
-            }
-            start.distance = 0;
-
-            int whileIncrement = 0;
-
-            while (unvisited.Count != 0) {
-                whileIncrement++;
-                AbstractNode bestNode = getBestNode(unvisited);
-                unvisited.Remove(bestNode);
-
-                if (animate) {
-                    if ((bestNode.cube.worldObject != target.cube.worldObject) && (bestNode.cube.worldObject != start.cube.worldObject)) {
-                        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, Instance.visitedMaterial, Instance.animationDelay * whileIncrement));
-                    }
-                }
-
-                if (bestNode == target) { break; }
-
-                foreach (var arc in bestNode.arcs) {
-                    AbstractNode neighbourNode = arc.Key;
-
-                    if (unvisited.Contains(neighbourNode)) {
-                        if (animate) {
-                            if ((neighbourNode.cube.worldObject != target.cube.worldObject) && (neighbourNode.cube.worldObject != start.cube.worldObject)) {
-                                Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, Instance.neighbourMaterial, Instance.animationDelay * whileIncrement));
-                            }
-                        }
-
-                        float tentativeWeight = bestNode.distance + arc.Value;
-
-                        if (tentativeWeight < neighbourNode.distance) {
-                            neighbourNode.distance = tentativeWeight;
-                            neighbourNode.prevNode = bestNode;
-                        }
-                    }
-                }
-            }
-
-            List<Cube> path = new List<Cube>();
-            AbstractNode tailNode = target;
-            int pathIncrement = 0;
-
-            while (tailNode != start) {
-                pathIncrement++;
-                if (animate) {
-                    Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
-                }
-
-                path.Insert(0, tailNode.cube);
-                tailNode = tailNode.prevNode;
-            }
-
-            path.Remove(start.cube);
-
-            return path;
         }
 
         public static CubePath createPath(Region region, Cube start, Cube target, bool animate = false) {
@@ -259,7 +176,7 @@ namespace AStar {
             return portals;
         }
 
-        static AbstractNode getBestNode(List<AbstractNode> list) {
+        public static AbstractNode getBestNode(List<AbstractNode> list) {
             AbstractNode bestNode = list[0];
 
             for (int i = 1; i < list.Count; i++) {
@@ -343,7 +260,7 @@ namespace AStar {
 
                 if (regionCube.isWalkable && neighbourCube.isWalkable) {
                     adjacentCubes.Add(regionCube);
-                    CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
+                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
 
                     if (z != regionSize - 1) {
                         continue;
@@ -373,7 +290,7 @@ namespace AStar {
 
                 if (regionCube.isWalkable && neighbourCube.isWalkable) {
                     adjacentCubes.Add(regionCube);
-                    CubeUtility.setMaterial(regionCube, WorldUtility.Instance.entranceMaterial);
+                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
 
                     if (x != regionSize - 1) {
                         continue;
@@ -389,12 +306,6 @@ namespace AStar {
                 }
             }
         }
-
-    }
-
-
-    public class Pathing {
-
 
     }
 
@@ -435,6 +346,107 @@ namespace AStar {
                     regions[z, x] = new AbstractRegion(world.regions[z, x]);
                 }
             }
+        }
+
+        public AbstractNode addAbstractNode(Cube cube, bool addArcs = true) {
+            AbstractNode newNode = new AbstractNode(cube);
+            AbstractRegion region = this.regions[cube.region.zPos, cube.region.xPos];
+
+            CubeUtility.setMaterial(cube, AStarUtility.Instance.portalMaterial);
+
+            if (addArcs) {
+                foreach (AbstractNode node in region.nodes) {
+                    //AStarUtility.print("Arc: " + newNode.cube.g_xPos + ", " + newNode.cube.g_zPos + " to " + node.cube.g_xPos + ", " + node.cube.g_zPos);
+                    float distance = AStarUtility.createPath(newNode.cube.region, newNode.cube, node.cube).distance;
+                    newNode.arcs.Add(node, distance);
+                    node.arcs.Add(newNode, distance);
+                }
+            }
+
+            this.nodes.Add(newNode);
+            region.nodes.Add(newNode);
+
+            return newNode;
+        }
+
+        public void removeAbstractNode(AbstractNode oldNode) {
+            AbstractRegion region = this.regions[oldNode.cube.region.zPos, oldNode.cube.region.xPos];
+            this.nodes.Remove(oldNode);
+            region.nodes.Remove(oldNode);
+            oldNode.arcs = null;
+
+            foreach (AbstractNode node in region.nodes) {
+                node.arcs.Remove(oldNode);
+            }
+        }
+
+        public List<Cube> createAbstractPath(AbstractNode start, AbstractNode target, bool animate = false) {
+            List<AbstractNode> unvisited = new List<AbstractNode>();
+
+            if (animate) {
+                CubeUtility.setMaterial(start.cube, AStarUtility.Instance.startMaterial);
+                CubeUtility.setMaterial(target.cube, AStarUtility.Instance.targetMaterial);
+            }
+
+            foreach (AbstractNode node in this.nodes) {
+                node.distance = Mathf.Infinity;
+                node.prevNode = null;
+                unvisited.Add(node);
+            }
+            start.distance = 0;
+
+            int whileIncrement = 0;
+
+            while (unvisited.Count != 0) {
+                whileIncrement++;
+                AbstractNode bestNode = AStarUtility.getBestNode(unvisited);
+                unvisited.Remove(bestNode);
+
+                if (animate) {
+                    if ((bestNode.cube.worldObject != target.cube.worldObject) && (bestNode.cube.worldObject != start.cube.worldObject)) {
+                        AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, AStarUtility.Instance.visitedMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
+                    }
+                }
+
+                if (bestNode == target) { break; }
+
+                foreach (var arc in bestNode.arcs) {
+                    AbstractNode neighbourNode = arc.Key;
+
+                    if (unvisited.Contains(neighbourNode)) {
+                        if (animate) {
+                            if ((neighbourNode.cube.worldObject != target.cube.worldObject) && (neighbourNode.cube.worldObject != start.cube.worldObject)) {
+                                AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, AStarUtility.Instance.neighbourMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
+                            }
+                        }
+
+                        float tentativeWeight = bestNode.distance + arc.Value;
+
+                        if (tentativeWeight < neighbourNode.distance) {
+                            neighbourNode.distance = tentativeWeight;
+                            neighbourNode.prevNode = bestNode;
+                        }
+                    }
+                }
+            }
+
+            List<Cube> path = new List<Cube>();
+            AbstractNode tailNode = target;
+            int pathIncrement = 0;
+
+            while (tailNode != start) {
+                pathIncrement++;
+                if (animate) {
+                    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
+                }
+
+                path.Insert(0, tailNode.cube);
+                tailNode = tailNode.prevNode;
+            }
+
+            path.Remove(start.cube);
+
+            return path;
         }
     }
 

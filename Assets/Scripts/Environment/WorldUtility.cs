@@ -12,8 +12,6 @@ namespace Worlds {
     public class WorldUtility : MonoBehaviour {
         public static WorldUtility Instance;
 
-        public Material portalMaterial;
-        public Material entranceMaterial;
         public int regionSize;
 
         void Awake() {
