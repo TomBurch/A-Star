@@ -50,8 +50,8 @@ namespace AStar {
                         CubePath path = createPath(region.region, region.nodes[i].cube, node.cube);
             
                         if (path != null) {
-                            region.nodes[i].arcs.Add(node, path.distance);
-                            node.arcs.Add(region.nodes[i], path.distance);
+                            region.nodes[i].arcs.Add(node, path.weight);
+                            node.arcs.Add(region.nodes[i], path.weight);
                         }
                     }
                 }
@@ -145,7 +145,7 @@ namespace AStar {
             List<Cube> path = new List<Cube>();
             Node tailNode = currentNode;
             int pathIncrement = 1;
-            float distance = currentNode.weight;
+            float pathWeight = currentNode.weight;
 
             path.Add(currentNode.cube);
 
@@ -155,14 +155,14 @@ namespace AStar {
                         Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.previousNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
                     }
                     path.Add(tailNode.previousNode.cube);
-                    distance += tailNode.previousNode.weight;
+                    pathWeight += tailNode.previousNode.weight;
                 }
                 tailNode = tailNode.previousNode;
                 pathIncrement++;
             }
 
             path.Reverse();
-            return new CubePath(path, distance);
+            return new CubePath(path, pathWeight);
         }
 
         public static float manhattan(Cube c1, Cube c2) {
@@ -300,12 +300,12 @@ namespace AStar {
     }
 
     public class CubePath {
-        public float distance;
+        public float weight;
         public List<Cube> cubes;
 
-        public CubePath(List<Cube> cubes, float distance) {
+        public CubePath(List<Cube> cubes, float weight) {
             this.cubes = cubes;
-            this.distance = distance;
+            this.weight = weight;
         }
     }
 
@@ -353,8 +353,8 @@ namespace AStar {
                     CubePath path = AStarUtility.createPath(newNode.cube.region, newNode.cube, node.cube);
 
                     if (path != null) {
-                        newNode.arcs.Add(node, path.distance);
-                        node.arcs.Add(newNode, path.distance);
+                        newNode.arcs.Add(node, path.weight);
+                        node.arcs.Add(newNode, path.weight);
                     }
                 }
             } else {
@@ -396,11 +396,11 @@ namespace AStar {
             }
 
             foreach (AbstractNode node in this.nodes) {
-                node.distance = Mathf.Infinity;
+                node.weight = Mathf.Infinity;
                 node.prevNode = null;
                 unvisited.Add(node);
             }
-            start.distance = 0;
+            start.weight = 0;
 
             int whileIncrement = 0;
 
@@ -429,10 +429,10 @@ namespace AStar {
                             }
                         }
 
-                        float tentativeWeight = bestNode.distance + arc.Value;
+                        float tentativeWeight = bestNode.weight + arc.Value;
 
-                        if (tentativeWeight < neighbourNode.distance) {
-                            neighbourNode.distance = tentativeWeight;
+                        if (tentativeWeight < neighbourNode.weight) {
+                            neighbourNode.weight = tentativeWeight;
                             neighbourNode.prevNode = bestNode;
                         }
                     }
@@ -465,12 +465,12 @@ namespace AStar {
             AbstractNode bestNode = list[0];
 
             for (int i = 1; i < list.Count; i++) {
-                if (list[i].distance < bestNode.distance) {
+                if (list[i].weight < bestNode.weight) {
                     bestNode = list[i];
                 }
             }
 
-            if (bestNode.distance == Mathf.Infinity) {
+            if (bestNode.weight == Mathf.Infinity) {
                 return null;
             }
 
@@ -491,7 +491,7 @@ namespace AStar {
     public class AbstractNode {
         public Dictionary<AbstractNode, float> arcs;
         public Cube cube;
-        public float distance;
+        public float weight;
         public AbstractNode prevNode;
 
         public AbstractNode(Cube cube) {
