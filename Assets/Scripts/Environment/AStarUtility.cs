@@ -47,7 +47,7 @@ namespace AStar {
             foreach (AbstractRegion region in graph.regions) {
                 for (int i = 0; i < region.nodes.Count - 1; i++) {
                     foreach (AbstractNode node in region.nodes.GetRange(i + 1, region.nodes.Count - (i + 1))) {
-                        CubePath path = createPath(region.region, region.nodes[i].cube, node.cube);
+                        CubePath path = createPath(region.nodes[i].cube, node.cube);
             
                         if (path != null) {
                             region.nodes[i].arcs.Add(node, path.weight);
@@ -60,7 +60,7 @@ namespace AStar {
             return graph;
         }
 
-        public static CubePath createPath(Region region, Cube start, Cube target, bool animate = false) {
+        public static CubePath createPath(Cube start, Cube target, bool animate = false) {
             //print("Pathing from [" + start.g_xPos + ", " + start.g_zPos + "] to [" + target.g_xPos + ", " + target.g_zPos + "]");
             List<List<Node>> grid = new List<List<Node>>();
             List<Node> unvisited = new List<Node>();
@@ -75,7 +75,7 @@ namespace AStar {
                 List<Node> row = new List<Node>();
 
                 for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
-                    Cube cube = region.cubes[z, x];
+                    Cube cube = start.region.cubes[z, x];
 
                     if (cube.isWalkable) {
                         if (cube.worldObject != start.worldObject) {
@@ -112,7 +112,7 @@ namespace AStar {
 
                     //A* manhattan -> f = g + speedModifier + h
                     //print("[" + currentNode.cube.g_xPos + ", " + currentNode.cube.g_zPos + "] [" + neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + "] g: " + currentNode.weight + " / speed: " + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + " / h: " + manhattan(neighbour.cube, target));
-                    if (!(unvisited.Contains(neighbour))) { continue;  }
+                    if (!(unvisited.Contains(neighbour))) { continue; }
                     
                     float tentativeWeight = currentNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour.cube, target);
 
@@ -146,24 +146,20 @@ namespace AStar {
 
             List<Cube> path = new List<Cube>();
             Node tailNode = currentNode;
-            int pathIncrement = 1;
+            int pathIncrement = 0;
             float pathWeight = currentNode.weight;
 
-            path.Add(currentNode.cube);
-
-            while (tailNode.previousNode != null) {
-                if (tailNode.previousNode.cube.worldObject != start.worldObject) {
-                    if (animate) {
-                        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.previousNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
-                    }
-                    path.Add(tailNode.previousNode.cube);
-                    pathWeight += tailNode.previousNode.weight;
-                }
-                tailNode = tailNode.previousNode;
+            while (tailNode.cube.worldObject != start.worldObject) {
                 pathIncrement++;
+                if (animate) {
+                    Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
+                }
+
+                path.Insert(0, tailNode.cube);
+                pathWeight += tailNode.weight;
+                tailNode = tailNode.previousNode;    
             }
 
-            path.Reverse();
             return new CubePath(path, pathWeight);
         }
 
@@ -350,7 +346,7 @@ namespace AStar {
                 cube.worldObject.tag = "TempNode";
 
                 foreach (AbstractNode node in region.nodes) {
-                    CubePath path = AStarUtility.createPath(newNode.cube.region, newNode.cube, node.cube);
+                    CubePath path = AStarUtility.createPath(newNode.cube, node.cube);
 
                     if (path != null) {
                         newNode.arcs.Add(node, path.weight);
