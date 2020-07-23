@@ -64,7 +64,6 @@ namespace AStar {
             //print("Pathing from [" + start.g_xPos + ", " + start.g_zPos + "] to [" + target.g_xPos + ", " + target.g_zPos + "]");
             List<List<Node>> grid = new List<List<Node>>();
             List<Node> unvisited = new List<Node>();
-            List<Node> visited = new List<Node>();
             Node currentNode = null;
 
             //CubeUtility.setMaterial(start, startMaterial);
@@ -78,15 +77,18 @@ namespace AStar {
                 for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
                     Cube cube = region.cubes[z, x];
 
-                    if (cube.worldObject != start.worldObject) {
-                        Node newNode = new Node(cube, Mathf.Infinity);
-                        row.Add(newNode);
-                        unvisited.Add(newNode);
-                    }
-                    else {
-                        currentNode = new Node(cube, 0);
-                        row.Add(currentNode);
-                        unvisited.Add(currentNode);
+                    if (cube.isWalkable) {
+                        if (cube.worldObject != start.worldObject) {
+                            Node newNode = new Node(cube, Mathf.Infinity);
+                            row.Add(newNode);
+                            unvisited.Add(newNode);
+                        } else {
+                            currentNode = new Node(cube, 0);
+                            row.Add(currentNode);
+                            unvisited.Add(currentNode);
+                        }
+                    } else {
+                        row.Add(null);
                     }
                 }
 
@@ -110,6 +112,8 @@ namespace AStar {
 
                     //A* manhattan -> f = g + speedModifier + h
                     //print("[" + currentNode.cube.g_xPos + ", " + currentNode.cube.g_zPos + "] [" + neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + "] g: " + currentNode.weight + " / speed: " + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + " / h: " + manhattan(neighbour.cube, target));
+                    if (!(unvisited.Contains(neighbour))) { continue;  }
+                    
                     float tentativeWeight = currentNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour.cube, target);
 
                     if (tentativeWeight < neighbour.weight) {
@@ -119,8 +123,6 @@ namespace AStar {
                 }
 
                 unvisited.Remove(currentNode);
-                visited.Add(currentNode);
-                currentNode.visited = true;
 
                 //if (animate) {
                 //    if ((currentNode.cube.worldObject != start.worldObject) && currentNode.cube.worldObject != target.worldObject) {
@@ -129,14 +131,14 @@ namespace AStar {
                 //}
 
                 if (currentNode.cube.worldObject == target.worldObject) {
-                    print("Target reached");
+                    //print("Target reached");
                     break;
                 }
 
                 currentNode = getClosestNode(unvisited);
 
                 if (currentNode == null) {
-                    print("No possible path");
+                    //print("No possible path");
                     return null;
                 }
                 whileIncrement++;
@@ -205,7 +207,7 @@ namespace AStar {
             if ((centerX - 1) >= 0) {
                 Node neighbourNode = grid[centerZ][centerX - 1];
 
-                if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
+                if (neighbourNode != null) {
                     neighbours.Add(neighbourNode);
                 }
             }
@@ -213,7 +215,7 @@ namespace AStar {
             if ((centerZ - 1) >= 0) {
                 Node neighbourNode = grid[centerZ - 1][centerX];
 
-                if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
+                if (neighbourNode != null) {
                     neighbours.Add(neighbourNode);
                 }
             }
@@ -221,7 +223,7 @@ namespace AStar {
             if ((centerX + 1) <= grid.Count - 1) {
                 Node neighbourNode = grid[centerZ][centerX + 1];
 
-                if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
+                if (neighbourNode != null) {
                     neighbours.Add(neighbourNode);
                 }
             }
@@ -229,7 +231,7 @@ namespace AStar {
             if ((centerZ + 1) <= grid.Count - 1) {
                 Node neighbourNode = grid[centerZ + 1][centerX];
 
-                if (!neighbourNode.visited && neighbourNode.cube.isWalkable == true) {
+                if (neighbourNode != null) {
                     neighbours.Add(neighbourNode);
                 }
             }
@@ -312,13 +314,11 @@ namespace AStar {
     public class Node {
         public float weight;
         public Cube cube;
-        public bool visited;
         public Node previousNode;
 
         public Node(Cube cube, float weight) {
             this.weight = weight;
             this.cube = cube;
-            this.visited = false;
             this.previousNode = null;
         }
     }

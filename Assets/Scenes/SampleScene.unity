@@ -1420,7 +1420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
     type: 3}
-  worldSize: 5
+  worldSize: 10
 --- !u!1 &315011911
 GameObject:
   m_ObjectHideFlags: 0
