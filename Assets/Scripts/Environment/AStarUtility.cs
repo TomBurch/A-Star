@@ -126,16 +126,18 @@ namespace AStar {
                         }
 
                         //Dijkstra's -> f = g + speedModifier
-                        //float tentativeWeight = currentNode.weight + neighbour.cube.speedModifier;
+                        float tentativeWeight = bestNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()];
 
                         //A* manhattan -> f = g + speedModifier + h
                         //print("[" + currentNode.cube.g_xPos + ", " + currentNode.cube.g_zPos + "] [" + neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + "] g: " + currentNode.weight + " / speed: " + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + " / h: " + manhattan(neighbour.cube, target));
 
-                        float tentativeWeight = bestNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour.cube, target);
+                        //float tentativeWeight = bestNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + manhattan(neighbour.cube, target);
 
                         if (tentativeWeight < neighbour.weight) {
                             neighbour.weight = tentativeWeight;
                             neighbour.prevNode = bestNode;
+
+                            if (animate) { print(neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + " changed to " + tentativeWeight); }
                         }
                     }
                 }
@@ -144,7 +146,6 @@ namespace AStar {
             List<Cube> path = new List<Cube>();
             CubeNode tailNode = bestNode;
             int pathIncrement = 0;
-            float pathWeight = bestNode.weight;
 
             while (tailNode.cube.worldObject != start.worldObject) {
                 pathIncrement++;
@@ -155,11 +156,10 @@ namespace AStar {
                 }
 
                 path.Insert(0, tailNode.cube);
-                pathWeight += tailNode.weight;
                 tailNode = tailNode.prevNode;    
             }
 
-            return new CubePath(path, pathWeight);
+            return new CubePath(path, bestNode.weight);
         }
 
         public static float manhattan(Cube c1, Cube c2) {
@@ -174,7 +174,6 @@ namespace AStar {
 
             return portals;
         }
-
 
         public static T getBestNode<T>(List<T> list) where T : Node {
             T bestNode = list[0];
