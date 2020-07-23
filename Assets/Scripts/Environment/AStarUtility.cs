@@ -5,6 +5,7 @@ using UnityEngine;
 using Cubes;
 using Regions;
 using Worlds;
+using System.Runtime.InteropServices;
 
 namespace AStar {
 
@@ -64,10 +65,10 @@ namespace AStar {
             List<List<CubeNode>> grid = new List<List<CubeNode>>();
             List<CubeNode> unvisited = new List<CubeNode>();
 
-            if (animate) {
-                CubeUtility.setMaterial(start, AStarUtility.Instance.startMaterial);
-                CubeUtility.setMaterial(target, AStarUtility.Instance.targetMaterial);
-            }
+            //if (animate) {
+            //    CubeUtility.setMaterial(start, AStarUtility.Instance.startMaterial);
+            //    CubeUtility.setMaterial(target, AStarUtility.Instance.targetMaterial);
+            //}
 
             // Wrap each Cube into a Node (giving it a weight variable)
             // Assign all nodes as 0 (start) or infinity
@@ -109,7 +110,7 @@ namespace AStar {
                 unvisited.Remove(bestNode);
 
                 if (animate) {
-                    if ((bestNode.cube.worldObject != start.worldObject) && bestNode.cube.worldObject != target.worldObject) {
+                    if (bestNode.cube.worldObject.tag == "Cube") {
                         Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, Instance.visitedMaterial, Instance.animationDelay * whileIncrement));
                     }
                 }
@@ -119,7 +120,7 @@ namespace AStar {
                 foreach (CubeNode neighbour in neighbours) {
                     if (unvisited.Contains(neighbour)) {
                         if (animate) {
-                            if ((neighbour.cube.worldObject != start.worldObject) && (neighbour.cube.worldObject != target.worldObject)) {
+                            if (neighbour.cube.worldObject.tag == "Cube") {
                                 AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbour.cube, Instance.neighbourMaterial, Instance.animationDelay * whileIncrement));
                             }
                         }
@@ -148,7 +149,9 @@ namespace AStar {
             while (tailNode.cube.worldObject != start.worldObject) {
                 pathIncrement++;
                 if (animate) {
-                    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
+                    if (tailNode.cube.worldObject.tag == "Cube") {
+                        AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
+                    }
                 }
 
                 path.Insert(0, tailNode.cube);
@@ -293,9 +296,9 @@ namespace AStar {
     }
 
     public class CubePath {
-        public float weight;
         public List<Cube> cubes;
-
+        public float weight;
+        
         public CubePath(List<Cube> cubes, float weight) {
             this.cubes = cubes;
             this.weight = weight;
@@ -384,13 +387,14 @@ namespace AStar {
             target.weight = Mathf.Infinity;
 
             int whileIncrement = 0;
+            AbstractNode bestNode = null;
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
-                AbstractNode bestNode = AStarUtility.getBestNode<AbstractNode>(unvisited);
+                bestNode = AStarUtility.getBestNode<AbstractNode>(unvisited);
 
-                if (bestNode == target) { break; }     // Path found
                 if (bestNode == null) { return null; } // No possible path
+                if (bestNode == target) { break; }     // Path found
 
                 unvisited.Remove(bestNode);
 
