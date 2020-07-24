@@ -30,7 +30,6 @@ namespace AStar {
             AbstractGraph graph = new AbstractGraph(world);
 
             // Create each node by region w/ interedges
-
             foreach (Region region in world.regions) {
                 List<Portal> portals = getPortals(region);
 
@@ -44,7 +43,6 @@ namespace AStar {
             }
 
             // Find intraedges
-
             foreach (AbstractRegion region in graph.regions) {
                 for (int i = 0; i < region.nodes.Count - 1; i++) {
                     foreach (AbstractNode node in region.nodes.GetRange(i + 1, region.nodes.Count - (i + 1))) {
@@ -67,11 +65,6 @@ namespace AStar {
             List<List<CubeNode>> grid = new List<List<CubeNode>>();
             List<CubeNode> unvisited = new List<CubeNode>();
 
-            //if (animate) {
-            //    CubeUtility.setMaterial(start, AStarUtility.Instance.startMaterial);
-            //    CubeUtility.setMaterial(target, AStarUtility.Instance.targetMaterial);
-            //}
-
             // Wrap each Cube into a Node (giving it a weight variable)
             // Assign all nodes as 0 (start) or infinity
             for (int z = 0; z < WorldUtility.Instance.regionSize; z++) {
@@ -82,9 +75,8 @@ namespace AStar {
 
                     if (cube.isWalkable) {
                         CubeNode newNode;
-                        if (cube.worldObject != start.worldObject) {
+                        if (cube != start) {
                             newNode = new CubeNode(cube, Mathf.Infinity);
-
                         } else {
                             newNode = new CubeNode(cube, 0);
                         }
@@ -147,7 +139,7 @@ namespace AStar {
             CubeNode tailNode = bestNode;
             int pathIncrement = 0;
 
-            while (tailNode.cube.worldObject != start.worldObject) {
+            while (tailNode.cube != start) {
                 pathIncrement++;
                 if (animate) {
                     if (tailNode.cube.worldObject.tag == "Cube") {
@@ -166,15 +158,6 @@ namespace AStar {
             Vector3 c1Pos = CubeUtility.getGlobalPos(c1);
             Vector3 c2Pos = CubeUtility.getGlobalPos(c2);
             return (Mathf.Abs(c2Pos.x - c1Pos.x) + Mathf.Abs(c2Pos.z - c1Pos.z));
-        }
-
-        static List<Portal> getPortals(Region region) {
-            List<Portal> portals = new List<Portal>();
-
-            checkRightColumn(region, portals);
-            checkTopRow(region, portals);
-
-            return portals;
         }
 
         public static T getBestNode<T>(List<T> list) where T : Node {
@@ -232,6 +215,15 @@ namespace AStar {
             }
 
             return neighbours;
+        }
+
+        static List<Portal> getPortals(Region region) {
+            List<Portal> portals = new List<Portal>();
+
+            checkRightColumn(region, portals);
+            checkTopRow(region, portals);
+
+            return portals;
         }
 
         static void checkRightColumn(Region region, List<Portal> portals) {
@@ -292,17 +284,6 @@ namespace AStar {
                     adjacentCubes = new List<Cube>();
                 }
             }
-        }
-
-    }
-
-    public class CubePath {
-        public List<Cube> cubes;
-        public float weight;
-        
-        public CubePath(List<Cube> cubes, float weight) {
-            this.cubes = cubes;
-            this.weight = weight;
         }
     }
 
@@ -365,7 +346,7 @@ namespace AStar {
         }
 
         public AbstractNode getAbstractNode(Cube cube) {
-            return this.nodes.Find(x => x.cube.worldObject == cube.worldObject);
+            return this.nodes.Find(x => x.cube == cube);
         }
         
         public CubePath createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
@@ -408,7 +389,7 @@ namespace AStar {
                 unvisited.Remove(bestNode);
 
                 if (animate) {
-                    if ((bestNode.cube.worldObject != target.cube.worldObject) && (bestNode.cube.worldObject != start.cube.worldObject)) {
+                    if ((bestNode.cube != target.cube) && (bestNode.cube != start.cube)) {
                         AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, AStarUtility.Instance.visitedMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
                     }
                 }
@@ -418,7 +399,7 @@ namespace AStar {
 
                     if (unvisited.Contains(neighbourNode)) {
                         if (animate) {
-                            if ((neighbourNode.cube.worldObject != target.cube.worldObject) && (neighbourNode.cube.worldObject != start.cube.worldObject)) {
+                            if ((neighbourNode.cube != target.cube) && (neighbourNode.cube != start.cube)) {
                                 AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, AStarUtility.Instance.neighbourMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
                             }
                         }
@@ -488,6 +469,16 @@ namespace AStar {
 
         public AbstractNode(Cube cube, float weight = Mathf.Infinity) : base(cube, weight) { 
             this.arcs = new Dictionary<AbstractNode, float>();
+        }
+    }
+
+    public class CubePath {
+        public List<Cube> cubes;
+        public float weight;
+
+        public CubePath(List<Cube> cubes, float weight) {
+            this.cubes = cubes;
+            this.weight = weight;
         }
     }
 

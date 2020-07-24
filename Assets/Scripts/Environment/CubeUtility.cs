@@ -93,9 +93,8 @@ namespace Cubes {
             int g_xPos = xPos + (WorldUtility.Instance.regionSize * region.xPos);
             int g_zPos = zPos + (WorldUtility.Instance.regionSize * region.zPos);
 
-            Transform cubeObject = CubeUtility.Instantiate(prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform);
-            cubeObject.name = name;
-            this.worldObject = cubeObject.gameObject;
+            this.worldObject = CubeUtility.Instantiate(prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform).gameObject;
+            worldObject.name = name;
         }
     }
 
