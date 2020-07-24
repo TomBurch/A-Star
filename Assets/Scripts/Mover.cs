@@ -21,7 +21,7 @@ public class Mover : MonoBehaviour {
         if (currentPath.Count == 0) { return; }
 
         if (AStarUtility.manhattan(currentCube, currentPath[0]) > 1f) {
-            List<Cube> path = AStarUtility.createPath(currentCube, currentPath[0], true).cubes;
+            List<Cube> path = AStarUtility.createPath(currentCube, currentPath[0], AStarUtility.Instance.animatePath).cubes;
             currentPath.RemoveAt(0);
 
             path.AddRange(currentPath);

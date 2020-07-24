@@ -8,10 +8,10 @@ using Cubes;
 using AStar;
 
 public class Setup : MonoBehaviour {
+    new public Camera camera;
     public Transform moverPrefab;
     public int worldSize;
-    new public Camera camera;
-
+    
     Mover mover;
     World world;
     

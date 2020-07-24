@@ -55,7 +55,7 @@ namespace Worlds {
                 }
             }
 
-            this.graph = AStarUtility.createAbstractGraph(this);
+            this.graph = new AbstractGraph(this);
         }
     }
 }
