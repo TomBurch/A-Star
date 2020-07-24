@@ -5,7 +5,6 @@ using UnityEngine;
 using Cubes;
 using Regions;
 using Worlds;
-using System.Runtime.InteropServices;
 
 namespace AStar {
 
@@ -41,20 +40,16 @@ namespace AStar {
                     Cube cube = start.region.cubes[z, x];
 
                     if (cube.isWalkable) {
-                        CubeNode newNode;
-                        if (cube != start) {
-                            newNode = new CubeNode(cube, Mathf.Infinity);
-                        } else {
-                            newNode = new CubeNode(cube, 0);
-                        }
-
-                        grid[z, x] = newNode;
-                        unvisited.Add(newNode);
+                        grid[z, x] = new CubeNode(cube, Mathf.Infinity);
+                        unvisited.Add(grid[z, x]);
                     } else {
                         grid[z, x] = null;
                     }
                 }
             }
+
+            grid[start.zPos, start.xPos] = new CubeNode(start, 0);
+            unvisited.Add(grid[start.zPos, start.xPos]);
 
             int whileIncrement = 0;
             CubeNode bestNode = null;
