@@ -29,34 +29,103 @@ namespace AStar {
         public static AbstractGraph createAbstractGraph(World world) {
             AbstractGraph graph = new AbstractGraph(world);
 
-            // Create each node by region w/ interedges
             foreach (Region region in world.regions) {
-                List<Portal> portals = getPortals(region);
-
-                foreach (Portal portal in portals) {
-                    AbstractNode entrance = graph.addAbstractNode(portal.entrance);
-                    AbstractNode exit = graph.addAbstractNode(portal.exit);
-
-                    entrance.arcs.Add(exit, 1f);
-                    exit.arcs.Add(entrance, 1f);
-                }
+                linkPortals(region);
             }
 
-            // Find intraedges
             foreach (AbstractRegion region in graph.regions) {
-                for (int i = 0; i < region.nodes.Count - 1; i++) {
-                    foreach (AbstractNode node in region.nodes.GetRange(i + 1, region.nodes.Count - (i + 1))) {
-                        CubePath path = createPath(region.nodes[i].cube, node.cube);
-            
-                        if (path != null) {
-                            region.nodes[i].arcs.Add(node, path.weight);
-                            node.arcs.Add(region.nodes[i], path.weight);
-                        }
-                    }
-                }
+                linkIntraedges(region);
             }
 
             return graph;
+        }
+
+        static void linkPortals(Region region) {
+            List<Portal> portals = new List<Portal>();
+
+            checkRightColumn(region, portals);
+            checkTopRow(region, portals);
+
+            foreach (Portal portal in portals) {
+                AbstractNode entrance = graph.addAbstractNode(portal.entrance);
+                AbstractNode exit = graph.addAbstractNode(portal.exit);
+
+                entrance.arcs.Add(exit, 1f);
+                exit.arcs.Add(entrance, 1f);
+            }
+        }
+
+        static void linkIntraedges(AbstractRegion region) {
+            for (int i = 0; i < region.nodes.Count - 1; i++) {
+                foreach (AbstractNode node in region.nodes.GetRange(i + 1, region.nodes.Count - (i + 1))) {
+                    CubePath path = createPath(region.nodes[i].cube, node.cube);
+
+                    if (path != null) {
+                        region.nodes[i].arcs.Add(node, path.weight);
+                        node.arcs.Add(region.nodes[i], path.weight);
+                    }
+                }
+            }
+        }
+
+        static void checkRightColumn(Region region, List<Portal> portals) {
+            if (!((region.xPos + 1) <= region.world.regions.GetLength(1) - 1)) { return; }
+
+            Region neighbour = region.world.regions[region.zPos, region.xPos + 1];
+            List<Cube> adjacentCubes = new List<Cube>();
+            int regionSize = WorldUtility.Instance.regionSize;
+
+            for (int z = 0; z < regionSize; z++) {
+                Cube regionCube = region.cubes[z, regionSize - 1];
+                Cube neighbourCube = neighbour.cubes[z, 0];
+
+                if (regionCube.isWalkable && neighbourCube.isWalkable) {
+                    adjacentCubes.Add(regionCube);
+                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
+
+                    if (z != regionSize - 1) {
+                        continue;
+                    }
+                }
+
+                if (adjacentCubes.Count > 0) {
+                    regionCube = adjacentCubes[adjacentCubes.Count >> 1];
+                    neighbourCube = neighbour.cubes[regionCube.zPos, 0];
+
+                    portals.Add(new Portal(regionCube, neighbourCube));
+                    adjacentCubes = new List<Cube>();
+                }
+            }
+        }
+
+        static void checkTopRow(Region region, List<Portal> portals) {
+            if (!((region.zPos + 1) <= region.world.regions.GetLength(0) - 1)) { return; }
+
+            Region neighbour = region.world.regions[region.zPos + 1, region.xPos];
+            List<Cube> adjacentCubes = new List<Cube>();
+            int regionSize = WorldUtility.Instance.regionSize;
+
+            for (int x = 0; x < regionSize; x++) {
+                Cube regionCube = region.cubes[regionSize - 1, x];
+                Cube neighbourCube = neighbour.cubes[0, x];
+
+                if (regionCube.isWalkable && neighbourCube.isWalkable) {
+                    adjacentCubes.Add(regionCube);
+                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
+
+                    if (x != regionSize - 1) {
+                        continue;
+                    }
+                }
+
+                if (adjacentCubes.Count > 0) {
+                    regionCube = adjacentCubes[adjacentCubes.Count >> 1];
+                    neighbourCube = neighbour.cubes[0, regionCube.xPos];
+
+                    portals.Add(new Portal(regionCube, neighbourCube));
+                    adjacentCubes = new List<Cube>();
+                }
+            }
         }
 
         public static CubePath createPath(Cube start, Cube target, bool animate = false) {
@@ -215,75 +284,6 @@ namespace AStar {
             }
 
             return neighbours;
-        }
-
-        static List<Portal> getPortals(Region region) {
-            List<Portal> portals = new List<Portal>();
-
-            checkRightColumn(region, portals);
-            checkTopRow(region, portals);
-
-            return portals;
-        }
-
-        static void checkRightColumn(Region region, List<Portal> portals) {
-            if (!((region.xPos + 1) <= region.world.regions.GetLength(1) - 1)) { return; }
-
-            Region neighbour = region.world.regions[region.zPos, region.xPos + 1];
-            List<Cube> adjacentCubes = new List<Cube>();
-            int regionSize = WorldUtility.Instance.regionSize;
-
-            for (int z = 0; z < regionSize; z++) {
-                Cube regionCube = region.cubes[z, regionSize - 1];
-                Cube neighbourCube = neighbour.cubes[z, 0];
-
-                if (regionCube.isWalkable && neighbourCube.isWalkable) {
-                    adjacentCubes.Add(regionCube);
-                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
-
-                    if (z != regionSize - 1) {
-                        continue;
-                    }
-                }
-
-                if (adjacentCubes.Count > 0) {
-                    regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                    neighbourCube = neighbour.cubes[regionCube.zPos, 0];
-
-                    portals.Add(new Portal(regionCube, neighbourCube));
-                    adjacentCubes = new List<Cube>();
-                }
-            }
-        }
-
-        static void checkTopRow(Region region, List<Portal> portals) {
-            if (!((region.zPos + 1) <= region.world.regions.GetLength(0) - 1)) { return; }
-
-            Region neighbour = region.world.regions[region.zPos + 1, region.xPos];
-            List<Cube> adjacentCubes = new List<Cube>();
-            int regionSize = WorldUtility.Instance.regionSize;
-
-            for (int x = 0; x < regionSize; x++) {
-                Cube regionCube = region.cubes[regionSize - 1, x];
-                Cube neighbourCube = neighbour.cubes[0, x];
-
-                if (regionCube.isWalkable && neighbourCube.isWalkable) {
-                    adjacentCubes.Add(regionCube);
-                    CubeUtility.setMaterial(regionCube, AStarUtility.Instance.entranceMaterial);
-
-                    if (x != regionSize - 1) {
-                        continue;
-                    }
-                }
-
-                if (adjacentCubes.Count > 0) {
-                    regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                    neighbourCube = neighbour.cubes[0, regionCube.xPos];
-
-                    portals.Add(new Portal(regionCube, neighbourCube));
-                    adjacentCubes = new List<Cube>();
-                }
-            }
         }
     }
 
