@@ -62,6 +62,8 @@ namespace AStar {
         }
 
         public static CubePath createPath(Cube start, Cube target, bool animate = false) {
+            if (!target.isWalkable) { return null; }
+            
             List<List<CubeNode>> grid = new List<List<CubeNode>>();
             List<CubeNode> unvisited = new List<CubeNode>();
 
@@ -136,8 +138,6 @@ namespace AStar {
                         if (tentativeWeight < neighbour.weight) {
                             neighbour.weight = tentativeWeight;
                             neighbour.prevNode = bestNode;
-
-                            if (animate) { print(neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + " changed to " + tentativeWeight); }
                         }
                     }
                 }
@@ -367,6 +367,8 @@ namespace AStar {
         }
         
         public List<Cube> createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
+            if (!targetCube.isWalkable) { return null; }
+
             AbstractNode start = this.addAbstractNode(startCube, 0f, true);
             AbstractNode target = this.addAbstractNode(targetCube, temporary: true);
             List<AbstractNode> unvisited = new List<AbstractNode>();
