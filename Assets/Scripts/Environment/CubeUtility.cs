@@ -20,10 +20,14 @@ namespace Cubes {
             Instance = this;
         }
 
-        public static Dictionary<string, float> SpeedModifiers = new Dictionary<string, float>() {
+        static Dictionary<string, float> SpeedModifiers = new Dictionary<string, float>() {
             { "Cubes.GrassCube", 1.0f },
             { "Cubes.RiverCube", 2.0f }
         };
+
+        public static float getSpeedModifier(Cube cube) {
+            return SpeedModifiers[cube.GetType().ToString()];
+        }
 
         public static Vector3 getPos(Cube cube) {
             return cube.worldObject.transform.position;

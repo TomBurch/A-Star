@@ -30,7 +30,7 @@ public class Mover : MonoBehaviour {
 
         float currentTime = Time.time;
         if (currentTime > nextMovementTime) {
-            float travelTime = CubeUtility.SpeedModifiers[currentPath[0].GetType().ToString()] * movementSpeed;
+            float travelTime = CubeUtility.getSpeedModifier(currentPath[0]) * this.movementSpeed;
             move(currentPath[0]);
             currentPath.RemoveAt(0);
 

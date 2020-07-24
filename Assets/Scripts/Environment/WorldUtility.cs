@@ -40,9 +40,9 @@ namespace Worlds {
         public Region[,] regions;
         public AbstractGraph graph;
 
-        public World(int size, GameObject container) {
+        public World(int size) {
             this.size = size;
-            this.container = container;
+            this.container = new GameObject("World");
 
             this.regions = new Region[size, size];
 

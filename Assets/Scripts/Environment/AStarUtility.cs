@@ -128,7 +128,7 @@ namespace AStar {
                         }
 
                         //Dijkstra's -> f = g + speedModifier
-                        float tentativeWeight = bestNode.weight + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()];
+                        float tentativeWeight = bestNode.weight + CubeUtility.getSpeedModifier(neighbour.cube);
 
                         //A* manhattan -> f = g + speedModifier + h
                         //print("[" + currentNode.cube.g_xPos + ", " + currentNode.cube.g_zPos + "] [" + neighbour.cube.g_xPos + ", " + neighbour.cube.g_zPos + "] g: " + currentNode.weight + " / speed: " + CubeUtility.SpeedModifiers[neighbour.cube.GetType().ToString()] + " / h: " + manhattan(neighbour.cube, target));
@@ -368,6 +368,7 @@ namespace AStar {
         
         public List<Cube> createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
             if (!targetCube.isWalkable) { return null; }
+            if (startCube.region == targetCube.region) { return AStarUtility.createPath(startCube, targetCube, true).cubes; }
 
             AbstractNode start = this.addAbstractNode(startCube, 0f, true);
             AbstractNode target = this.addAbstractNode(targetCube, temporary: true);
