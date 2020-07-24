@@ -20,6 +20,10 @@ namespace Cubes {
             Instance = this;
         }
 
+        ///<summary> 
+        /// Float used to multiply the mover's movement time <br></br><br></br>
+        /// (greater speedModifier = lesser speed) 
+        ///</summary>
         static Dictionary<string, float> SpeedModifiers = new Dictionary<string, float>() {
             { "Cubes.GrassCube", 1.0f },
             { "Cubes.RiverCube", 2.0f }
@@ -42,6 +46,9 @@ namespace Cubes {
             cube.worldObject.GetComponent<MeshRenderer>().material = newMaterial;
         }
 
+        /// <summary> 
+        /// Remove the containedObject of a cube 
+        /// </summary>
         public static void clearCube(Cube cube) {
             if (cube.containedObject != null) {
                 Destroy(cube.containedObject);
@@ -51,14 +58,12 @@ namespace Cubes {
         }
 
         public static void destroyCube(Cube cube) {
-            clearCube(cube);
             Destroy(cube.worldObject);
+            cube = null;
         }
 
         public static Cube newCube(Region region, string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
             Cube cube = null;
-            int g_xPos = xPos + (WorldUtility.Instance.regionSize * region.xPos);
-            int g_zPos = zPos + (WorldUtility.Instance.regionSize * region.zPos);
 
             switch (cubeType) {
                 case "GrassCube": cube = new GrassCube(region, xPos, zPos, parent, name);
@@ -66,10 +71,6 @@ namespace Cubes {
                 case "RiverCube": cube = new RiverCube(region, xPos, zPos, parent, name);
                     break;
             }
-        
-            Transform cubeObject = Instantiate(cube.prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform);
-            cubeObject.name = name;
-            cube.worldObject = cubeObject.gameObject;
 
             return cube;
         }
@@ -79,7 +80,6 @@ namespace Cubes {
         public int xPos, zPos;
         public Region region;
         public bool isWalkable;
-        public Transform prefab;
         public GameObject containedObject;
         public GameObject worldObject;
 
@@ -88,8 +88,14 @@ namespace Cubes {
             this.xPos = xPos;
             this.zPos = zPos;
             this.isWalkable = isWalkable;
-            this.prefab = prefab;
             this.containedObject = null;
+
+            int g_xPos = xPos + (WorldUtility.Instance.regionSize * region.xPos);
+            int g_zPos = zPos + (WorldUtility.Instance.regionSize * region.zPos);
+
+            Transform cubeObject = CubeUtility.Instantiate(prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform);
+            cubeObject.name = name;
+            this.worldObject = cubeObject.gameObject;
         }
     }
 
