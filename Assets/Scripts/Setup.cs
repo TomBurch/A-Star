@@ -37,10 +37,10 @@ public class Setup : MonoBehaviour {
 
             if (Physics.Raycast(ray, out hit)) {
                 GameObject clickedObject = hit.transform.gameObject;
-                List<Cube> path = world.graph.createAbstractPath(mover.currentCube, WorldUtility.getCube(world, (int) clickedObject.transform.position.x, (int) clickedObject.transform.position.z));
+                CubePath path = world.graph.createAbstractPath(mover.currentCube, WorldUtility.getCube(world, (int) clickedObject.transform.position.x, (int) clickedObject.transform.position.z));
                 
                 if (path != null) {
-                    mover.currentPath = path;
+                    mover.currentPath = path.cubes;
                 }
             }
         }

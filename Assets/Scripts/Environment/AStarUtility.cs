@@ -368,9 +368,9 @@ namespace AStar {
             return this.nodes.Find(x => x.cube.worldObject == cube.worldObject);
         }
         
-        public List<Cube> createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
+        public CubePath createAbstractPath(Cube startCube, Cube targetCube, bool animate = false) {
             if (!targetCube.isWalkable) { return null; }
-            if (startCube.region == targetCube.region) { return AStarUtility.createPath(startCube, targetCube, true).cubes; }
+            if (startCube.region == targetCube.region) { return AStarUtility.createPath(startCube, targetCube, true); }
 
             AbstractNode start = this.addAbstractNode(startCube, 0f, true);
             AbstractNode target = this.addAbstractNode(targetCube, temporary: true);
@@ -397,7 +397,12 @@ namespace AStar {
                 whileIncrement++;
                 bestNode = AStarUtility.getBestNode<AbstractNode>(unvisited);
 
-                if (bestNode == null) { return null; } // No possible path
+                if (bestNode == null) {                // No possible path
+                    this.removeAbstractNode(start);
+                    this.removeAbstractNode(target); 
+                    return null; 
+                } 
+                
                 if (bestNode == target) { break; }     // Path found
 
                 unvisited.Remove(bestNode);
@@ -447,7 +452,7 @@ namespace AStar {
             this.removeAbstractNode(start);
             this.removeAbstractNode(target);
 
-            return path;
+            return new CubePath(path, target.weight);
         }
     }
 
