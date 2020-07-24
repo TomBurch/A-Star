@@ -25,7 +25,7 @@ namespace Regions {
         }
 
         public static void spawnTree(Cube cube) {
-            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity, cube.worldObject.transform).gameObject;
+            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getGlobalPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity, cube.worldObject.transform).gameObject;
             cube.isWalkable = false;
         }
 
@@ -35,15 +35,15 @@ namespace Regions {
             foreach (Vector3 point in riverPath) {
                 Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                region.cubes[cube.l_zPos, cube.l_xPos] = CubeUtility.newCube(region, "RiverCube", cube.l_xPos, cube.l_zPos, region.container, string.Format("{0}-{1}-{2}", cube.l_xPos, 1, cube.l_zPos));
+                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, region.container, string.Format("{0}-{1}-{2}", cube.xPos, 1, cube.zPos));
             }
         }
 
         private static List<Vector3> bresenhamPath(Cube start, Cube end) {
-            int x = start.l_xPos;
-            int z = start.l_zPos;
-            int x2 = end.l_xPos;
-            int z2 = end.l_zPos;
+            int x = start.xPos;
+            int z = start.zPos;
+            int x2 = end.xPos;
+            int z2 = end.zPos;
 
             int w = x2 - x;
             int h = z2 - z;

@@ -39,7 +39,7 @@ public class Mover : MonoBehaviour {
     }
 
     public void move(Cube cube) {
-        transform.position = CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f);
+        transform.position = CubeUtility.getGlobalPos(cube) + new Vector3(0f, 0.5f, 0f);
         currentCube = cube;
     }
 }

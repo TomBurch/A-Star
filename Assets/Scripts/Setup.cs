@@ -25,7 +25,7 @@ public class Setup : MonoBehaviour {
             start = WorldUtility.randomCube(world);
         }
 
-        GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
+        GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getGlobalPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         mover = moverObject.GetComponent<Mover>();
         mover.currentCube = start;
     }

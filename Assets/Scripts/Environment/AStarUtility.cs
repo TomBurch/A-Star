@@ -163,7 +163,9 @@ namespace AStar {
         }
 
         public static float manhattan(Cube c1, Cube c2) {
-            return (Mathf.Abs(c2.g_xPos - c1.g_xPos) + Mathf.Abs(c2.g_zPos - c1.g_zPos));
+            Vector3 c1Pos = CubeUtility.getGlobalPos(c1);
+            Vector3 c2Pos = CubeUtility.getGlobalPos(c2);
+            return (Mathf.Abs(c2Pos.x - c1Pos.x) + Mathf.Abs(c2Pos.z - c1Pos.z));
         }
 
         static List<Portal> getPortals(Region region) {
@@ -194,8 +196,8 @@ namespace AStar {
         static List<CubeNode> getNeighbours(CubeNode centerNode, List<List<CubeNode>> grid) {
             List<CubeNode> neighbours = new List<CubeNode>();
 
-            int centerX = centerNode.cube.l_xPos;
-            int centerZ = centerNode.cube.l_zPos;
+            int centerX = centerNode.cube.xPos;
+            int centerZ = centerNode.cube.zPos;
 
             if ((centerX - 1) >= 0) {
                 CubeNode neighbourNode = grid[centerZ][centerX - 1];
@@ -254,7 +256,7 @@ namespace AStar {
 
                 if (adjacentCubes.Count > 0) {
                     regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                    neighbourCube = neighbour.cubes[regionCube.l_zPos, 0];
+                    neighbourCube = neighbour.cubes[regionCube.zPos, 0];
 
                     portals.Add(new Portal(regionCube, neighbourCube));
                     adjacentCubes = new List<Cube>();
@@ -284,7 +286,7 @@ namespace AStar {
 
                 if (adjacentCubes.Count > 0) {
                     regionCube = adjacentCubes[adjacentCubes.Count >> 1];
-                    neighbourCube = neighbour.cubes[0, regionCube.l_xPos];
+                    neighbourCube = neighbour.cubes[0, regionCube.xPos];
 
                     portals.Add(new Portal(regionCube, neighbourCube));
                     adjacentCubes = new List<Cube>();
