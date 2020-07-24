@@ -20,12 +20,20 @@ namespace Cubes {
             Instance = this;
         }
 
-        public static Dictionary<string, float> SpeedModifiers = new Dictionary<string, float>() {
+        ///<summary> 
+        /// Float used to multiply the mover's movement time <br></br><br></br>
+        /// (greater speedModifier = lesser speed) 
+        ///</summary>
+        static Dictionary<string, float> SpeedModifiers = new Dictionary<string, float>() {
             { "Cubes.GrassCube", 1.0f },
             { "Cubes.RiverCube", 2.0f }
         };
 
-        public static Vector3 getPos(Cube cube) {
+        public static float getSpeedModifier(Cube cube) {
+            return SpeedModifiers[cube.GetType().ToString()];
+        }
+
+        public static Vector3 getGlobalPos(Cube cube) {
             return cube.worldObject.transform.position;
         }
 
@@ -38,6 +46,9 @@ namespace Cubes {
             cube.worldObject.GetComponent<MeshRenderer>().material = newMaterial;
         }
 
+        /// <summary> 
+        /// Remove the containedObject of a cube 
+        /// </summary>
         public static void clearCube(Cube cube) {
             if (cube.containedObject != null) {
                 Destroy(cube.containedObject);
@@ -47,56 +58,51 @@ namespace Cubes {
         }
 
         public static void destroyCube(Cube cube) {
-            clearCube(cube);
             Destroy(cube.worldObject);
+            cube = null;
         }
 
-        public static Cube newCube(Region region, string cubeType, int l_xPos, int l_zPos, GameObject parent, string name = "Cube") {
+        public static Cube newCube(Region region, string cubeType, int xPos, int zPos, GameObject parent, string name = "Cube") {
             Cube cube = null;
-            int g_xPos = l_xPos + (WorldUtility.Instance.regionSize * region.xPos);
-            int g_zPos = l_zPos + (WorldUtility.Instance.regionSize * region.zPos);
 
             switch (cubeType) {
-                case "GrassCube": cube = new GrassCube(g_xPos, g_zPos, region, l_xPos, l_zPos, parent, name);
+                case "GrassCube": cube = new GrassCube(region, xPos, zPos, parent, name);
                     break;
-                case "RiverCube": cube = new RiverCube(g_xPos, g_zPos, region, l_xPos, l_zPos, parent, name);
+                case "RiverCube": cube = new RiverCube(region, xPos, zPos, parent, name);
                     break;
             }
-        
-            Transform cubeObject = Instantiate(cube.prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform);
-            cubeObject.name = name;
-            cube.worldObject = cubeObject.gameObject;
 
             return cube;
         }
     }
 
     public class Cube {
-        public int g_xPos, g_zPos;
-        public int l_xPos, l_zPos;
+        public int xPos, zPos;
         public Region region;
         public bool isWalkable;
-        public Transform prefab;
         public GameObject containedObject;
         public GameObject worldObject;
 
-        public Cube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
-            this.g_xPos = g_xPos;
-            this.g_zPos = g_zPos;
+        public Cube(Region region, int xPos, int zPos, bool isWalkable, Transform prefab, GameObject parent, string name) {
             this.region = region;
-            this.l_xPos = l_xPos;
-            this.l_zPos = l_zPos;
+            this.xPos = xPos;
+            this.zPos = zPos;
             this.isWalkable = isWalkable;
-            this.prefab = prefab;
             this.containedObject = null;
+
+            int g_xPos = xPos + (WorldUtility.Instance.regionSize * region.xPos);
+            int g_zPos = zPos + (WorldUtility.Instance.regionSize * region.zPos);
+
+            this.worldObject = CubeUtility.Instantiate(prefab, new Vector3(g_xPos, 0f, g_zPos), Quaternion.identity, parent.transform).gameObject;
+            worldObject.name = name;
         }
     }
 
     public class GrassCube : Cube {
-        public GrassCube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, GameObject parent, string name = "GrassCube") : base(g_xPos, g_zPos, region, l_xPos, l_zPos, true, CubeUtility.Instance.grassPrefab, parent, name) { }
+        public GrassCube(Region region, int xPos, int zPos, GameObject parent, string name = "GrassCube") : base(region, xPos, zPos, true, CubeUtility.Instance.grassPrefab, parent, name) { }
     }
 
     public class RiverCube : Cube {
-        public RiverCube(int g_xPos, int g_zPos, Region region, int l_xPos, int l_zPos, GameObject parent, string name = "RiverCube") : base(g_xPos, g_zPos, region, l_xPos, l_zPos, true, CubeUtility.Instance.riverPrefab, parent, name) { }
+        public RiverCube(Region region, int xPos, int zPos, GameObject parent, string name = "RiverCube") : base(region, xPos, zPos, true, CubeUtility.Instance.riverPrefab, parent, name) { }
     }
 }

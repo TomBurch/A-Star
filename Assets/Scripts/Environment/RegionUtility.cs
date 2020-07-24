@@ -25,7 +25,7 @@ namespace Regions {
         }
 
         public static void spawnTree(Cube cube) {
-            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity, cube.worldObject.transform).gameObject;
+            cube.containedObject = Instantiate(Instance.treePrefab, CubeUtility.getGlobalPos(cube) + new Vector3(0f, 0.5f, 0f), Quaternion.identity, cube.worldObject.transform).gameObject;
             cube.isWalkable = false;
         }
 
@@ -35,15 +35,18 @@ namespace Regions {
             foreach (Vector3 point in riverPath) {
                 Cube cube = region.cubes[(int) point.z, (int) point.x];
                 CubeUtility.destroyCube(cube);
-                region.cubes[cube.l_zPos, cube.l_xPos] = CubeUtility.newCube(region, "RiverCube", cube.l_xPos, cube.l_zPos, region.container, string.Format("{0}-{1}-{2}", cube.l_xPos, 1, cube.l_zPos));
+                region.cubes[cube.zPos, cube.xPos] = CubeUtility.newCube(region, "RiverCube", cube.xPos, cube.zPos, region.container, string.Format("{0}-{1}-{2}", cube.xPos, 1, cube.zPos));
             }
         }
 
+        /// <summary>
+        /// Get a list of points between two cubes using bresenham's line algorithm
+        /// </summary>
         private static List<Vector3> bresenhamPath(Cube start, Cube end) {
-            int x = start.l_xPos;
-            int z = start.l_zPos;
-            int x2 = end.l_xPos;
-            int z2 = end.l_zPos;
+            int x = start.xPos;
+            int z = start.zPos;
+            int x2 = end.xPos;
+            int z2 = end.zPos;
 
             int w = x2 - x;
             int h = z2 - z;
@@ -98,7 +101,7 @@ namespace Regions {
                     x += dx_v;
                     z += dz_v;
 
-                    path.Add(new Vector3(x - dx_v + dx_h, 0, z - dz_v + dz_h)); //Fill in gaps to have fully connected line
+                    path.Add(new Vector3(x - dx_v + dx_h, 0, z - dz_v + dz_h)); // Fill in gaps to have fully connected line
                 }
                 else { //Move horizontally
                     x += dx_h;
@@ -128,7 +131,7 @@ namespace Regions {
             Generate();
         }
 
-        public void Generate() {
+        void Generate() {
             for (int z = 0; z < WorldUtility.Instance.regionSize; z++) {
                 for (int x = 0; x < WorldUtility.Instance.regionSize; x++) {
                     cubes[z, x] = CubeUtility.newCube(this, "GrassCube", x, z, container, string.Format("{0}-{1}-{2}", x, 1, z));
@@ -145,7 +148,7 @@ namespace Regions {
                 Cube start = RegionUtility.randomCube(this);
                 Cube end = RegionUtility.randomCube(this);
 
-                while (start.worldObject == end.worldObject) {
+                while (start == end) {
                     end = RegionUtility.randomCube(this);
                 }
 
@@ -154,4 +157,3 @@ namespace Regions {
         } 
     }
 }
-

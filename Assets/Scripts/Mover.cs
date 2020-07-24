@@ -21,7 +21,7 @@ public class Mover : MonoBehaviour {
         if (currentPath.Count == 0) { return; }
 
         if (AStarUtility.manhattan(currentCube, currentPath[0]) > 1f) {
-            List<Cube> path = AStarUtility.createPath(currentCube, currentPath[0], true).cubes;
+            List<Cube> path = AStarUtility.createPath(currentCube, currentPath[0], AStarUtility.Instance.animatePath).cubes;
             currentPath.RemoveAt(0);
 
             path.AddRange(currentPath);
@@ -30,7 +30,7 @@ public class Mover : MonoBehaviour {
 
         float currentTime = Time.time;
         if (currentTime > nextMovementTime) {
-            float travelTime = CubeUtility.SpeedModifiers[currentPath[0].GetType().ToString()] * movementSpeed;
+            float travelTime = CubeUtility.getSpeedModifier(currentPath[0]) * this.movementSpeed;
             move(currentPath[0]);
             currentPath.RemoveAt(0);
 
@@ -39,7 +39,7 @@ public class Mover : MonoBehaviour {
     }
 
     public void move(Cube cube) {
-        transform.position = CubeUtility.getPos(cube) + new Vector3(0f, 0.5f, 0f);
+        transform.position = CubeUtility.getGlobalPos(cube) + new Vector3(0f, 0.5f, 0f);
         currentCube = cube;
     }
 }
