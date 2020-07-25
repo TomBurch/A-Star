@@ -182,6 +182,8 @@ namespace AStar {
         public List<AbstractNode> nodes;
         public AbstractRegion[,] regions;
 
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
         public AbstractGraph(World world) {
             nodes = new List<AbstractNode>();
             regions = new AbstractRegion[world.size, world.size];
@@ -348,6 +350,8 @@ namespace AStar {
             if (!targetCube.isWalkable) { return null; }
             if (startCube.region == targetCube.region) { return AStarUtility.createPath(startCube, targetCube, AStarUtility.Instance.animatePath); }
 
+            stopwatch.Start();
+
             AbstractNode start = this.addAbstractNode(startCube, 0f, true);
             AbstractNode target = this.addAbstractNode(targetCube, temporary: true);
             List<AbstractNode> unvisited = new List<AbstractNode>();
@@ -370,7 +374,12 @@ namespace AStar {
 
                 if (bestNode == null) {                // No possible path
                     this.removeAbstractNode(start);
-                    this.removeAbstractNode(target); 
+                    this.removeAbstractNode(target);
+
+                    stopwatch.Stop();
+                    AStarUtility.print("Failed abstract path in " + stopwatch.ElapsedMilliseconds + " ms");
+                    stopwatch.Reset();
+
                     return null; 
                 } 
                 
@@ -422,6 +431,10 @@ namespace AStar {
 
             this.removeAbstractNode(start);
             this.removeAbstractNode(target);
+
+            stopwatch.Stop();
+            AStarUtility.print("Created abstract path in " + stopwatch.ElapsedMilliseconds + " ms");
+            stopwatch.Reset();
 
             return new CubePath(path, target.weight);
         }
