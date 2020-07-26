@@ -36,6 +36,7 @@ namespace Worlds {
 
     public class World {
         public int size;
+        public int width;
         public GameObject container;
         public Region[,] regions;
         public AbstractGraph graph;
@@ -46,6 +47,7 @@ namespace Worlds {
             stopwatch.Start();
 
             this.size = size;
+            this.width = size * WorldUtility.Instance.regionSize;
             this.container = new GameObject("World");
 
             this.regions = new Region[size, size];

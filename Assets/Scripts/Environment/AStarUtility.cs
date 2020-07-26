@@ -14,7 +14,9 @@ namespace AStar {
         public static AStarUtility Instance;
         public enum PathMethod {
             Dijkstras,
-            AStar_Manhattan
+            AStar_Manhattan,
+            AStar_SquaredEuclidean,
+            AStar_ScaledManhattan
         }
 
         public Material visitedMaterial;
@@ -30,9 +32,12 @@ namespace AStar {
         public bool drawPortals;
         public bool drawEntrances;
         public float animationDelay;
+
+        public float pValue;
         
         void Awake() {
             Instance = this;
+            this.pValue = 0;
         }
 
         public static CubePath createPath(Cube start, Cube target, bool animate = false) {
@@ -62,6 +67,7 @@ namespace AStar {
             int whileIncrement = 0;
             CubeNode bestNode = null;
             Action<CubeNode, CubeNode, float, Cube> updateWeight = getWeightMethod(Instance.pathMethod);
+           // AStarUtility.Instance.pValue = 1 / manhattan(start, target);
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
@@ -189,6 +195,32 @@ namespace AStar {
             }
         }
         
+        static void astar_squaredEuclidean<T>(T bestNode, T neighbourNode, float arcWeight, Cube target) where T : Node {
+            float tentative_g = bestNode.g + arcWeight;
+            float tentative_h = squaredEuclidean(neighbourNode.cube, target);
+
+            //print(tentative_g + " + " + tentative_h);
+
+            if ((tentative_g + tentative_h) < (neighbourNode.g + neighbourNode.h)) {
+                neighbourNode.g = tentative_g;
+                neighbourNode.h = tentative_h;
+                neighbourNode.prevNode = bestNode;
+            }
+        }
+
+        static void astar_scaledManhattan<T>(T bestNode, T neighbourNode, float arcWeight, Cube target) where T : Node {
+            float tentative_g = bestNode.g + arcWeight;
+            float tentative_h = manhattan(neighbourNode.cube, target) * (1 + AStarUtility.Instance.pValue);
+
+            //print(tentative_g + " + " + tentative_h);
+
+            if ((tentative_g + tentative_h) < (neighbourNode.g + neighbourNode.h)) {
+                neighbourNode.g = tentative_g;
+                neighbourNode.h = tentative_h;
+                neighbourNode.prevNode = bestNode;
+            }
+        }
+
         public static Action<Node, Node, float, Cube> getWeightMethod(PathMethod method) {
             switch (method) {
                 case (PathMethod.Dijkstras):
@@ -196,6 +228,12 @@ namespace AStar {
 
                 case (PathMethod.AStar_Manhattan):
                     return astar_manhattan;
+
+                case (PathMethod.AStar_SquaredEuclidean):
+                    return astar_squaredEuclidean;
+
+                case (PathMethod.AStar_ScaledManhattan):
+                    return astar_scaledManhattan;
 
                 default:
                     return null;
@@ -205,7 +243,13 @@ namespace AStar {
         public static float manhattan(Cube c1, Cube c2) {
             Vector3 c1Pos = CubeUtility.getGlobalPos(c1);
             Vector3 c2Pos = CubeUtility.getGlobalPos(c2);
-            return (Mathf.Abs(c2Pos.x - c1Pos.x) + Mathf.Abs(c2Pos.z - c1Pos.z));
+            return Mathf.Abs(c2Pos.x - c1Pos.x) + Mathf.Abs(c2Pos.z - c1Pos.z);
+        }
+
+        static float squaredEuclidean(Cube c1, Cube c2) {
+            Vector3 c1Pos = CubeUtility.getGlobalPos(c1);
+            Vector3 c2Pos = CubeUtility.getGlobalPos(c2);
+            return Mathf.Pow(Mathf.Abs(c2Pos.x - c1Pos.x), 2) + Mathf.Pow(Mathf.Abs(c2Pos.z - c1Pos.z), 2);
         }
     }
 
@@ -400,6 +444,7 @@ namespace AStar {
             int whileIncrement = 0;
             AbstractNode bestNode = null;
             Action<Node, Node, float, Cube> updateWeight = AStarUtility.getWeightMethod(AStarUtility.Instance.abstractPathMethod);
+            //AStarUtility.Instance.pValue = 1 / (AStarUtility.manhattan(startCube, targetCube) / 8);
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
@@ -447,9 +492,9 @@ namespace AStar {
 
             while (tailNode != start) {
                 pathIncrement++;
-                //if (AStarUtility.Instance.animateAbstractPath) {
-                //    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
-                //}
+                if (AStarUtility.Instance.animateAbstractPath) {
+                    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
+                }
 
                 path.Insert(0, tailNode.cube);
                 tailNode = (AbstractNode) tailNode.prevNode;
@@ -461,7 +506,7 @@ namespace AStar {
             this.removeAbstractNode(target);
 
             stopwatch.Stop();
-            AStarUtility.print("Created abstract path in " + stopwatch.ElapsedMilliseconds + " ms");
+            AStarUtility.print("Created abstract path in " + stopwatch.ElapsedMilliseconds + " ms, weight = " + target.g);
             stopwatch.Reset();
 
             return new CubePath(path, target.g);

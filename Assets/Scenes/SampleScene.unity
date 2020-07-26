@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70464557ff2001446a7d9d9190a7d05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  regionSize: 10
+  regionSize: 5
 --- !u!114 &273982519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,12 +392,13 @@ MonoBehaviour:
   portalMaterial: {fileID: 2100000, guid: eab13fcb19ea46a479081781e00515b2, type: 2}
   entranceMaterial: {fileID: 2100000, guid: f9969ea40be67d34fb459cbf937e8a70, type: 2}
   pathMethod: 0
-  abstractPathMethod: 1
+  abstractPathMethod: 3
   animatePath: 0
-  animateAbstractPath: 0
+  animateAbstractPath: 1
   drawPortals: 0
   drawEntrances: 0
   animationDelay: 0
+  pValue: 0.325
 --- !u!114 &273982521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,10 +411,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549968aea2524574f99c795f99ff8fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 1092136888}
+  camera: {fileID: 2073409858}
   moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
     type: 3}
-  worldSize: 10
+  worldSize: 60
 --- !u!1 &1092136886
 GameObject:
   m_ObjectHideFlags: 0
