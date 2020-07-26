@@ -391,8 +391,10 @@ MonoBehaviour:
   pathMaterial: {fileID: 2100000, guid: 51e7a823d4fc59a4997ef106fc7c761b, type: 2}
   portalMaterial: {fileID: 2100000, guid: eab13fcb19ea46a479081781e00515b2, type: 2}
   entranceMaterial: {fileID: 2100000, guid: f9969ea40be67d34fb459cbf937e8a70, type: 2}
-  animatePath: 1
-  animateAbstractPath: 1
+  pathMethod: 0
+  abstractPathMethod: 1
+  animatePath: 0
+  animateAbstractPath: 0
   drawPortals: 0
   drawEntrances: 0
   animationDelay: 0
@@ -411,7 +413,7 @@ MonoBehaviour:
   camera: {fileID: 1092136888}
   moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
     type: 3}
-  worldSize: 30
+  worldSize: 10
 --- !u!1 &1092136886
 GameObject:
   m_ObjectHideFlags: 0
