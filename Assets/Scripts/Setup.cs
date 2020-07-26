@@ -16,7 +16,7 @@ public class Setup : MonoBehaviour {
     World world;
     
     void Start() {
-        UnityEngine.Random.InitState(67);
+        UnityEngine.Random.InitState(64);
 
         world = new World(worldSize);
 

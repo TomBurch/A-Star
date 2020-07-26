@@ -61,7 +61,7 @@ namespace AStar {
 
             int whileIncrement = 0;
             CubeNode bestNode = null;
-            Action<CubeNode, CubeNode, float> updateWeight = getWeightMethod(Instance.pathMethod);
+            Action<CubeNode, CubeNode, float, Cube> updateWeight = getWeightMethod(Instance.pathMethod);
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
@@ -80,15 +80,15 @@ namespace AStar {
 
                 List<CubeNode> neighbours = getNeighbours(bestNode, grid);
 
-                foreach (CubeNode neighbour in neighbours) {
-                    if (unvisited.Contains(neighbour)) {
+                foreach (CubeNode neighbourNode in neighbours) {
+                    if (unvisited.Contains(neighbourNode)) {
                         //if (animate) {
                         //    if (neighbour.cube.worldObject.tag == "Cube") {
                         //        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbour.cube, Instance.neighbourMaterial, Instance.animationDelay * whileIncrement));
                         //    }
                         //}
-                        
-                        updateWeight(bestNode, neighbour, CubeUtility.getSpeedModifier(neighbour.cube));
+
+                        updateWeight(bestNode, neighbourNode, CubeUtility.getSpeedModifier(neighbourNode.cube), target);
                     }
                 }
             }
@@ -112,15 +112,11 @@ namespace AStar {
             return new CubePath(path, bestNode.g);
         }
 
-        public static float getWeight<T>(T node) where T: Node {
-            return (node.g + node.h);
-        }
-
         public static T getBestNode<T>(List<T> list) where T : Node {
             T bestNode = list[0];
 
             for (int i = 1; i < list.Count; i++) {
-                if (getWeight<T>(list[i]) < getWeight<T>(bestNode)) {
+                if ((list[i].g + list[i].h) < (bestNode.g + bestNode.h)) {
                     bestNode = list[i];
                 }
             }
@@ -173,7 +169,7 @@ namespace AStar {
             return neighbours;
         }
     
-        static void dijkstras<T>(T bestNode, T neighbourNode, float arcWeight) where T : Node {
+        static void dijkstras<T>(T bestNode, T neighbourNode, float arcWeight, Cube target) where T : Node {
             float tentativeWeight = bestNode.g + arcWeight;
 
             if (tentativeWeight < neighbourNode.g) {
@@ -182,18 +178,18 @@ namespace AStar {
             }
         }
 
-        static void astar_manhattan<T>(T bestNode, T neighbourNode, float arcWeight) where T : Node {
+        static void astar_manhattan<T>(T bestNode, T neighbourNode, float arcWeight, Cube target) where T : Node {
             float tentative_g = bestNode.g + arcWeight;
-            float tentative_h = manhattan(bestNode.cube, neighbourNode.cube);
+            float tentative_h = manhattan(neighbourNode.cube, target);
 
-            if (tentative_g + tentative_h < getWeight<T>(neighbourNode)) {
+            if ((tentative_g + tentative_h) < (neighbourNode.g + neighbourNode.h)) {
                 neighbourNode.g = tentative_g;
                 neighbourNode.h = tentative_h;
                 neighbourNode.prevNode = bestNode;
             }
         }
         
-        public static Action<Node, Node, float> getWeightMethod(PathMethod method) {
+        public static Action<Node, Node, float, Cube> getWeightMethod(PathMethod method) {
             switch (method) {
                 case (PathMethod.Dijkstras):
                     return dijkstras;
@@ -403,7 +399,7 @@ namespace AStar {
 
             int whileIncrement = 0;
             AbstractNode bestNode = null;
-            Action<Node, Node, float> updateWeight = AStarUtility.getWeightMethod(AStarUtility.Instance.abstractPathMethod);
+            Action<Node, Node, float, Cube> updateWeight = AStarUtility.getWeightMethod(AStarUtility.Instance.abstractPathMethod);
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
@@ -440,7 +436,7 @@ namespace AStar {
                         //    }
                         //}
 
-                        updateWeight(bestNode, neighbourNode, arc.Value);
+                        updateWeight(bestNode, neighbourNode, arc.Value, targetCube);
                     }
                 }
             }
