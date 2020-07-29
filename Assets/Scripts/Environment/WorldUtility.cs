@@ -36,12 +36,18 @@ namespace Worlds {
 
     public class World {
         public int size;
+        public int width;
         public GameObject container;
         public Region[,] regions;
         public AbstractGraph graph;
 
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
         public World(int size) {
+            stopwatch.Start();
+
             this.size = size;
+            this.width = size * WorldUtility.Instance.regionSize;
             this.container = new GameObject("World");
 
             this.regions = new Region[size, size];
@@ -55,7 +61,16 @@ namespace Worlds {
                 }
             }
 
+            stopwatch.Stop();
+            WorldUtility.print("World made in: " + stopwatch.ElapsedMilliseconds + " ms");
+
+            stopwatch.Reset();
+            stopwatch.Start();
+
             this.graph = new AbstractGraph(this);
+
+            stopwatch.Stop();
+            WorldUtility.print("Abstract graph made in: " + stopwatch.ElapsedMilliseconds + " ms");
         }
     }
 }

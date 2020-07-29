@@ -16,14 +16,17 @@ public class Setup : MonoBehaviour {
     World world;
     
     void Start() {
-        UnityEngine.Random.InitState(67);
+        UnityEngine.Random.InitState(64);
 
         world = new World(worldSize);
-        Cube start = WorldUtility.randomCube(world);
 
-        while (!start.isWalkable) {
-            start = WorldUtility.randomCube(world);
-        }
+        Cube start = WorldUtility.getCube(world, 0, 0);
+        CubeUtility.clearCube(start);
+        //Cube start = WorldUtility.randomCube(world);
+
+        //while (!start.isWalkable) {
+        //    start = WorldUtility.randomCube(world);
+        //}
 
         GameObject moverObject = Instantiate(moverPrefab, CubeUtility.getGlobalPos(start) + new Vector3(0f, 0.5f, 0f), Quaternion.identity).gameObject;
         mover = moverObject.GetComponent<Mover>();
