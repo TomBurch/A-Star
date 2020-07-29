@@ -492,9 +492,9 @@ namespace AStar {
 
             while (tailNode != start) {
                 pathIncrement++;
-                if (AStarUtility.Instance.animateAbstractPath) {
-                    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
-                }
+                //if (AStarUtility.Instance.animateAbstractPath) {
+                //    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
+                //}
 
                 path.Insert(0, tailNode.cube);
                 tailNode = (AbstractNode) tailNode.prevNode;
