@@ -329,7 +329,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   treePrefab: {fileID: 5377376025468098663, guid: 06f6e3ceb0ca2c84eb904898eb8d8880,
     type: 3}
-  treeSpawnChance: 0.35
+  treeSpawnChance: 0.15
   riverSpawnChance: 1
 --- !u!4 &273982517
 Transform:
@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70464557ff2001446a7d9d9190a7d05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  regionSize: 5
+  regionSize: 10
 --- !u!114 &273982519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -393,11 +393,11 @@ MonoBehaviour:
   entranceMaterial: {fileID: 2100000, guid: f9969ea40be67d34fb459cbf937e8a70, type: 2}
   pathMethod: 0
   abstractPathMethod: 0
-  animatePath: 0
+  animatePath: 1
   animateAbstractPath: 1
-  drawPortals: 0
-  drawEntrances: 0
-  animationDelay: 0
+  drawPortals: 1
+  drawEntrances: 1
+  animationDelay: 0.001
   pValue: 0.325
 --- !u!114 &273982521
 MonoBehaviour:
@@ -411,10 +411,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549968aea2524574f99c795f99ff8fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 2073409858}
+  camera: {fileID: 1873738509}
   moverPrefab: {fileID: 3220614401623209152, guid: 6b29c42a2bdd23e47b4a2a5e9f3af514,
     type: 3}
-  worldSize: 60
+  worldSize: 10
 --- !u!1 &1092136886
 GameObject:
   m_ObjectHideFlags: 0

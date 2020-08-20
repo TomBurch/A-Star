@@ -37,11 +37,13 @@ namespace AStar {
         
         void Awake() {
             Instance = this;
-            this.pValue = 0;
         }
 
         public static CubePath createPath(Cube start, Cube target, bool animate = false) {
             if (!target.isWalkable) { return null; }
+
+            //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            //stopwatch.Start();
 
             CubeNode[,] grid = new CubeNode[WorldUtility.Instance.regionSize, WorldUtility.Instance.regionSize];
             List<CubeNode> unvisited = new List<CubeNode>();
@@ -67,7 +69,6 @@ namespace AStar {
             int whileIncrement = 0;
             CubeNode bestNode = null;
             Action<CubeNode, CubeNode, float, Cube> updateWeight = getWeightMethod(Instance.pathMethod);
-           // AStarUtility.Instance.pValue = 1 / manhattan(start, target);
 
             while (unvisited.Count != 0) {
                 whileIncrement++;
@@ -78,21 +79,21 @@ namespace AStar {
                 
                 unvisited.Remove(bestNode);
 
-                //if (animate) {
-                //    if (bestNode.cube.worldObject.tag == "Cube") {
-                //        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, Instance.visitedMaterial, Instance.animationDelay * whileIncrement));
-                //    }
-                //}
+                if (animate) {
+                    if (bestNode.cube.worldObject.tag == "Cube") {
+                        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, Instance.visitedMaterial, Instance.animationDelay * whileIncrement));
+                    }
+                }
 
                 List<CubeNode> neighbours = getNeighbours(bestNode, grid);
 
                 foreach (CubeNode neighbourNode in neighbours) {
                     if (unvisited.Contains(neighbourNode)) {
-                        //if (animate) {
-                        //    if (neighbour.cube.worldObject.tag == "Cube") {
-                        //        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbour.cube, Instance.neighbourMaterial, Instance.animationDelay * whileIncrement));
-                        //    }
-                        //}
+                        if (animate) {
+                            if (neighbourNode.cube.worldObject.tag == "Cube") {
+                                Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, Instance.neighbourMaterial, Instance.animationDelay * whileIncrement));
+                            }
+                        }
 
                         updateWeight(bestNode, neighbourNode, CubeUtility.getSpeedModifier(neighbourNode.cube), target);
                     }
@@ -105,15 +106,19 @@ namespace AStar {
 
             while (tailNode.cube != start) {
                 pathIncrement++;
-                //if (animate) {
-                //    if (tailNode.cube.worldObject.tag == "Cube") {
-                //        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
-                //    }
-                //}
+                if (animate) {
+                    if (tailNode.cube.worldObject.tag == "Cube") {
+                        Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, Instance.pathMaterial, (Instance.animationDelay * whileIncrement) + (Instance.animationDelay * pathIncrement)));
+                    }
+                }
 
                 path.Insert(0, tailNode.cube);
                 tailNode = (CubeNode) tailNode.prevNode;    
             }
+
+            //stopwatch.Stop();
+            //AStarUtility.print("Created path in " + stopwatch.ElapsedMilliseconds + " ms, weight = " + bestNode.g);
+            //stopwatch.Reset();
 
             return new CubePath(path, bestNode.g);
         }
@@ -465,21 +470,21 @@ namespace AStar {
 
                 unvisited.Remove(bestNode);
 
-                //if (AStarUtility.Instance.animateAbstractPath) {
-                //    if ((bestNode.cube != target.cube) && (bestNode.cube != start.cube)) {
-                //        AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, AStarUtility.Instance.visitedMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
-                //    }
-                //}
+                if (AStarUtility.Instance.animateAbstractPath) {
+                    if ((bestNode.cube != target.cube) && (bestNode.cube != start.cube)) {
+                        AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(bestNode.cube, AStarUtility.Instance.visitedMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
+                    }
+                }
 
                 foreach (var arc in bestNode.arcs) {
                     AbstractNode neighbourNode = arc.Key;
 
                     if (unvisited.Contains(neighbourNode)) {
-                        //if (AStarUtility.Instance.animateAbstractPath) {
-                        //    if ((neighbourNode.cube != target.cube) && (neighbourNode.cube != start.cube)) {
-                        //        AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, AStarUtility.Instance.neighbourMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
-                        //    }
-                        //}
+                        if (AStarUtility.Instance.animateAbstractPath) {
+                            if ((neighbourNode.cube != target.cube) && (neighbourNode.cube != start.cube)) {
+                                AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(neighbourNode.cube, AStarUtility.Instance.neighbourMaterial, AStarUtility.Instance.animationDelay * whileIncrement));
+                            }
+                        }
 
                         updateWeight(bestNode, neighbourNode, arc.Value, targetCube);
                     }
@@ -492,9 +497,9 @@ namespace AStar {
 
             while (tailNode != start) {
                 pathIncrement++;
-                //if (AStarUtility.Instance.animateAbstractPath) {
-                //    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
-                //}
+                if (AStarUtility.Instance.animateAbstractPath) {
+                    AStarUtility.Instance.StartCoroutine(CubeUtility.setMaterialAfterDelay(tailNode.cube, AStarUtility.Instance.pathMaterial, (AStarUtility.Instance.animationDelay * whileIncrement) + (AStarUtility.Instance.animationDelay * pathIncrement)));
+                }
 
                 path.Insert(0, tailNode.cube);
                 tailNode = (AbstractNode) tailNode.prevNode;
